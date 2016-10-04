@@ -1,6 +1,14 @@
 var MongoClient = require('mongodb').MongoClient
 var mongo = require('mongodb');
 var assert = require('assert');
+var randomString = require('random-string');
+
+var optionsForId = {
+  length: 32,
+  numeric: true,
+  letters: true,
+  special: false
+};
 
 var url = 'mongodb://finance.api.polarflare.com:27017/poc';
 
@@ -13,23 +21,40 @@ var getConnection = function(callback) {
       db.close();
     });
   });
-}
+};
+
+var createEquity = function(equity, callback) {
+  equity.id = randomString(optionsForId);
+  
+  getConnection(function(db) {
+    console.log('Creating equity');
+    var collection = db.collection('documents');
+    
+    collection.insert(equity, function(err, result) {
+      
+      console.log(JSON.stringify(result.result));
+      console.log(JSON.stringify(result.ops));
+      delete equity._id;
+      callback(equity);
+    });
+  });
+};
 
 var getEquityById = function(id, callback) {
   getConnection(function(db) {
-    console.log('inside callback, id = ' + id);
+    console.log('Retrieving object by id ' + id);
     var collection = db.collection('documents');
     
-    var o_id = new mongo.ObjectId(id);
-    collection.find({'_id': o_id}).toArray(function(err, docs) {
-      assert.equal(err, null);
+    collection.find({'id': id}).toArray(function(err, docs) {
+      var doc = docs.length > 0 ? docs[0] : null;
       console.log("Found the following records");
-      console.log(docs);
-      callback(docs);
+      console.log(doc);
+      callback(doc);
     });
   });
 };
 
 module.exports = {
-  getEquityById: getEquityById
+  getEquityById: getEquityById,
+  createEquity: createEquity
 };

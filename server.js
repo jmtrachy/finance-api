@@ -21,12 +21,38 @@ app.use(function(req, res, next) {
   next();
 });
 
+// Route for retrieving an equity by Id
 app.get('/v1/equities/:id', function(req, res) {
-  dal.getEquityById(req.params.id, function(docs){
-    console.log('Made it all the way back!');
+  dal.getEquityById(req.params.id, function(doc){
     res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(docs));
+    
+    if (doc != null) {
+      res.status(200).send(JSON.stringify(doc));  
+    } else {
+      var errorMessage = {
+        error: 'No equity found with id ' + req.params.id
+      }
+      res.status(404).send(errorMessage);
+    }
+    
   });
+});
+
+// Route for creating an equity
+app.post('/v1/equities', function(req, res) {
+  var reqBody = req.body;
+  console.log(JSON.stringify(reqBody));
+  if (!reqBody.id) {
+    dal.createEquity(reqBody, function(equity) {
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(equity));
+    });
+  } else {
+    res.setHeader('Content-Type', 'application/json');
+    res.status(400).send('{ "error": "Update not supported yet" }');
+  }
+  
+  //dal.createEquity(req.body)
 });
 
 app.listen(port, function() {
