@@ -7,6 +7,23 @@ equityRouter.use(function(req, res, next) {
   res.setHeader('Content-Type', 'application/json');
   next();
 });
+
+// Route for retrieving a bunch of equities with a filter applied.  Currently filter is required and only works for 'dow'
+equityRouter.get('/', function(req, res) {
+  var filter = req.query.filter;
+  if (!filter) {
+    res.status(400).send(JSON.stringify({error:"'filter' is a required query parameter."}));
+  } else {
+    filter = filter.toLowerCase();
+    if (filter != 'dow') {
+      res.status(400).send(JSON.stringify({error:'The only options available for the filter parameter are: dow'}));
+    } else {
+      dal.getEquitiesByFilter('dow', 'True', function(docs) {
+        res.status(200).send(JSON.stringify(docs));
+      });
+    }
+  } 
+});
                  
 // Route for retrieving an equity by Id
 equityRouter.get('/:id', function(req, res) {

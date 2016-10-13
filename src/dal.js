@@ -41,6 +41,23 @@ var createEquity = function(equity, callback) {
   });
 };
 
+// Should this really be allowed?  Seems very exploitable if not controlled properly
+var getEquitiesByFilter = function(queryField, queryValue, callback) {
+  getConnection(function(db) {
+    var query = {};
+    query[queryField] = queryValue;
+    console.log('Retrieving object by ' + JSON.stringify(query));
+    
+    var collection = db.collection(db_collection);
+    collection.find(query).toArray(function(err, docs) {
+      for (doc in docs) {
+        delete docs[doc]._id;
+      }
+      callback(docs);
+    });
+  });
+};
+
 var getEquityById = function(id, callback) {
   getConnection(function(db) {
     var query = null;
@@ -90,5 +107,6 @@ module.exports = {
   getEquityById: getEquityById,
   createEquity: createEquity,
   deleteEquity: deleteEquity,
-  updateEquity: updateEquity
+  updateEquity: updateEquity,
+  getEquitiesByFilter: getEquitiesByFilter
 };
