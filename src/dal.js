@@ -11,7 +11,8 @@ var optionsForId = {
 };
 
 var url = 'mongodb://finance.api.polarflare.com:27017/poc';
-var db_collection = 'documents';
+var equity_collection = 'equities';
+var snapshot_collection = 'snapshots';
 
 var getConnection = function(callback) {
   MongoClient.connect(url, function(err, db) {
@@ -30,7 +31,7 @@ var createEquity = function(equity, callback) {
   getConnection(function(db) {
     console.log('Creating equity');
 
-    var collection = db.collection(db_collection);
+    var collection = db.collection(equity_collection);
     collection.insert(equity, function(err, result) {
       
       console.log(JSON.stringify(result.result));
@@ -48,7 +49,7 @@ var getEquitiesByFilter = function(queryField, queryValue, callback) {
     query[queryField] = queryValue;
     console.log('Retrieving object by ' + JSON.stringify(query));
     
-    var collection = db.collection(db_collection);
+    var collection = db.collection(equity_collection);
     collection.find(query).toArray(function(err, docs) {
       for (doc in docs) {
         delete docs[doc]._id;
@@ -70,7 +71,7 @@ var getEquityById = function(id, callback) {
     }
     console.log('Retrieving object by ' + JSON.stringify(query));
     
-    var collection = db.collection(db_collection);
+    var collection = db.collection(equity_collection);
     collection.find(query).toArray(function(err, docs) {
       var doc = docs.length > 0 ? docs[0] : null;
       console.log("Retrieved the following records from the database");
@@ -85,7 +86,7 @@ var getEquityById = function(id, callback) {
 
 var deleteEquity = function(id, callback) {
   getConnection(function(db) {
-    var collection = db.collection(db_collection);
+    var collection = db.collection(equity_collection);
     collection.deleteOne({'id':id}, function(err, result) {
       console.log('Equity by id ' + id + ' has been deleted.');
       callback();
@@ -95,7 +96,7 @@ var deleteEquity = function(id, callback) {
 
 var updateEquity = function(id, params, callback) {
   getConnection(function(db) {
-    var collection = db.collection(db_collection);
+    var collection = db.collection(equity_collection);
     collection.updateOne({'id':id}, { $set: params }, function(err, result) {
       console.log('Equity by id ' + id + ' has been updated with ' + JSON.stringify(params));
       callback();
@@ -103,10 +104,60 @@ var updateEquity = function(id, params, callback) {
   });
 };
 
+// Creates a new snapshot in the database
+var createSnapshot = function(snapshot, callback) {
+  snapshot.id = randomString(optionsForId);
+  
+  getConnection(function(db) {
+    var collection = db.collection(snapshot_collection);
+    collection.insert(snapshot, function(err, result) {
+      
+      console.log(JSON.stringify(result.result));
+      console.log(JSON.stringify(result.ops));
+      delete snapshot._id;
+      callback(snapshot);
+    });
+  });
+};
+
+// Retrieves a single snapshot by id
+var getSnapshotById = function(id, callback) {
+  getConnection(function(db) {
+    var query = {'id': id};
+    console.log('Retrieving object by ' + JSON.stringify(query));
+    
+    var collection = db.collection(snapshot_collection);
+    collection.find(query).toArray(function(err, docs) {
+      var doc = docs.length > 0 ? docs[0] : null;
+      console.log("Retrieved the following records from the database");
+      console.log(doc == null ? 'None found' : doc);
+      if (doc != null) {
+        delete doc._id;
+      }
+      callback(doc);
+    });
+  });
+};
+
+var deleteSnapshotById = function(id, callback) {
+  getConnection(function(db) {
+    var collection = db.collection(snapshot_collection);
+    collection.deleteOne({'id':id}, function(err, result) {
+      console.log('Snapshot by id ' + id + ' has been deleted.');
+      callback();
+    });
+  });
+};
+
 module.exports = {
+  // Equities
   getEquityById: getEquityById,
   createEquity: createEquity,
   deleteEquity: deleteEquity,
   updateEquity: updateEquity,
-  getEquitiesByFilter: getEquitiesByFilter
+  getEquitiesByFilter: getEquitiesByFilter,
+  // Snapshots
+  createSnapshot: createSnapshot,
+  getSnapshotById: getSnapshotById,
+  deleteSnapshotById: deleteSnapshotById
 };

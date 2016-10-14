@@ -3,6 +3,7 @@ var requestId = require('request-id/express');
 var bodyParser = require('body-parser');
 var dal = require('./dal.js');
 var equityRouter = require('./routes/equities.js');
+var snapshotRouter = require('./routes/snapshots.js');
 var app = express();
 
 var port = 5000;
@@ -23,6 +24,7 @@ app.use(function(req, res, next) {
 });
 
 app.use('/v1/equities', equityRouter);
+app.use('/v1/snapshots', snapshotRouter);
 
 app.listen(port, function() {
   startupMessage = 'Server started, up and listening on port ' + port;

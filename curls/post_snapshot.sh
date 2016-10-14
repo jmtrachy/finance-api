@@ -1,0 +1,1 @@
+curl -v -X POST -H "Content-Type: application/json" -d '{"createdDate":"10-13-2016","ticker":"AAPL", "name":"Apple Inc.","exchange":"NASDAQ","industry":"Technology","dow":"True"}' http://localhost:5000/v1/snapshots
