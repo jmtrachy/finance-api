@@ -42,6 +42,21 @@ var createEquity = function(equity, callback) {
   });
 };
 
+var getAllEquities = function(callback) {
+  getConnection(function(db) {
+    var query = {}
+    console.log('Retrieving all equities');
+    
+    var collection = db.collection(equity_collection);
+    collection.find(query).toArray(function(err, docs) {
+      for (doc in docs) {
+        delete docs[doc]._id;
+      }
+      callback(docs);
+    });
+  });           
+};
+
 // Should this really be allowed?  Seems very exploitable if not controlled properly
 var getEquitiesByFilter = function(queryField, queryValue, callback) {
   getConnection(function(db) {
@@ -151,11 +166,13 @@ var deleteSnapshotById = function(id, callback) {
 
 module.exports = {
   // Equities
+  getAllEquities: getAllEquities,
   getEquityById: getEquityById,
   createEquity: createEquity,
   deleteEquity: deleteEquity,
   updateEquity: updateEquity,
   getEquitiesByFilter: getEquitiesByFilter,
+  
   // Snapshots
   createSnapshot: createSnapshot,
   getSnapshotById: getSnapshotById,

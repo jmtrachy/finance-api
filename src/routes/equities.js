@@ -12,7 +12,9 @@ equityRouter.use(function(req, res, next) {
 equityRouter.get('/', function(req, res) {
   var filter = req.query.filter;
   if (!filter) {
-    res.status(400).send(JSON.stringify({error:"'filter' is a required query parameter."}));
+    dal.getAllEquities(function(docs) {
+      res.status(200).send(JSON.stringify(docs));
+    });
   } else {
     filter = filter.toLowerCase();
     if (filter != 'dow') {
