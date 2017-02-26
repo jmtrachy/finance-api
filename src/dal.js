@@ -14,6 +14,7 @@ var optionsForId = {
 var url = 'mongodb://localhost:27017/poc'
 var equity_collection = 'equities';
 var snapshot_collection = 'snapshots';
+var aggregate_collection = 'aggregates';
 
 var getConnection = function(callback) {
   MongoClient.connect(url, function(err, db) {
@@ -172,7 +173,7 @@ var getSnapshotsByTicker = function(ticker, limit, callback) {
       callback(docs);
     });
   });
-}
+};
 
 var deleteSnapshotById = function(id, callback) {
   getConnection(function(db) {
@@ -180,6 +181,42 @@ var deleteSnapshotById = function(id, callback) {
     collection.deleteOne({'id':id}, function(err, result) {
       console.log('Snapshot by id ' + id + ' has been deleted.');
       callback();
+    });
+  });
+};
+
+// Creates a new aggregate in the database
+var createAggregate = function(aggregate, callback) {
+  aggregate.id = randomString(optionsForId);
+  
+  getConnection(function(db) {
+    var collection = db.collection(aggregate_collection);
+    collection.insert(aggregate, function(err, result) {
+      
+      console.log(JSON.stringify(result.result));
+      console.log(JSON.stringify(result.ops));
+      delete aggregate._id;
+      callback(aggregate);
+    });
+  });
+};
+
+// Retrieves aggregates by ticker symbol - always sorting by date descending first
+var getAggregatesByTicker = function(ticker, limit, callback) {
+  getConnection(function(db) {
+    var query = {'ticker': ticker};
+    var options = {
+      'limit': limit,
+      'sort': [['date', 'desc']]
+    };
+    console.log('Retrieving aggregates by ticker ' + ticker + ' the actual query is ' + JSON.stringify(query) + ' and the query options are ' + JSON.stringify(options));
+    
+    var collection = db.collection(aggregate_collection);
+    collection.find(query, options).toArray(function(err, docs) {
+      for (doc in docs) {
+        delete docs[doc]._id;
+      }
+      callback(docs);
     });
   });
 };
@@ -197,5 +234,9 @@ module.exports = {
   createSnapshot: createSnapshot,
   getSnapshotById: getSnapshotById,
   getSnapshotsByTicker: getSnapshotsByTicker,
-  deleteSnapshotById: deleteSnapshotById
+  deleteSnapshotById: deleteSnapshotById,
+  
+  // Aggregates
+  createAggregate: createAggregate,
+  getAggregatesByTicker: getAggregatesByTicker
 };
