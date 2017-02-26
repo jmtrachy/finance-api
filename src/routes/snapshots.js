@@ -8,23 +8,24 @@ snapshotRouter.use(function(req, res, next) {
   next();
 });
 
-/*
 snapshotRouter.get('/', function(req, res) {
-  var filter = req.query.filter;
-  if (!filter) {
-    res.status(400).send(JSON.stringify({error:"'filter' is a required query parameter."}));
+  var ticker = req.query.ticker;
+  if (!ticker) {
+    res.status(400).send(JSON.stringify({error:"'ticker' is a required query parameter."}));
   } else {
-    filter = filter.toLowerCase();
-    if (filter != 'date') {
-      res.status(400).send(JSON.stringify({error:'The only options available for the filter parameter are: dow'}));
+    ticker = ticker.toUpperCase();
+    var numResults = req.query.limit;
+    console.log('numResults = ' + numResults);
+    if (typeof numResults === 'undefined') {
+      numResults = 1;
     } else {
-      dal.getEquitiesByFilter('dow', 'True', function(docs) {
-        res.status(200).send(JSON.stringify(docs));
-      });
+      numResults = Number(numResults);
     }
+    dal.getSnapshotsByTicker(ticker, numResults, function(docs) {
+      res.status(200).send(JSON.stringify(docs));
+    });
   } 
 });
-*/
 
 // Route for creating an equity
 snapshotRouter.post('/', function(req, res) {
@@ -40,7 +41,7 @@ snapshotRouter.post('/', function(req, res) {
   }  
 });
 
-// Route for retrieving an equity by Id
+// Route for retrieving a snapshot by Id
 snapshotRouter.get('/:id', function(req, res) {
   dal.getSnapshotById(req.params.id, function(doc){
     

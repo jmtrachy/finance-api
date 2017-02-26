@@ -1,5 +1,5 @@
 var MongoClient = require('mongodb').MongoClient
-var mongo = require('mongodb');
+//var mongo = require('mongodb');
 var assert = require('assert');
 var randomString = require('random-string');
 
@@ -10,7 +10,8 @@ var optionsForId = {
   special: false
 };
 
-var url = 'mongodb://finance.api.polarflare.com:27017/poc';
+//var url = 'mongodb://finance.api.polarflare.com:27017/poc';
+var url = 'mongodb://localhost:27017/poc'
 var equity_collection = 'equities';
 var snapshot_collection = 'snapshots';
 
@@ -154,6 +155,22 @@ var getSnapshotById = function(id, callback) {
   });
 };
 
+var getSnapshotsByTicker = function(ticker, limit, callback) {
+  getConnection(function(db) {
+    var query = {'ticker': ticker};
+    var options = {'limit': limit};
+    console.log('Retrieving snapshots by ticker ' + ticker + ' the actual query is ' + JSON.stringify(query) + ' and the query options are ' + JSON.stringify(options));
+    
+    var collection = db.collection(snapshot_collection);
+    collection.find(query, options).toArray(function(err, docs) {
+      for (doc in docs) {
+        delete docs[doc]._id;
+      }
+      callback(docs);
+    });
+  });
+}
+
 var deleteSnapshotById = function(id, callback) {
   getConnection(function(db) {
     var collection = db.collection(snapshot_collection);
@@ -176,5 +193,6 @@ module.exports = {
   // Snapshots
   createSnapshot: createSnapshot,
   getSnapshotById: getSnapshotById,
+  getSnapshotsByTicker: getSnapshotsByTicker,
   deleteSnapshotById: deleteSnapshotById
 };
