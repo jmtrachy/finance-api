@@ -22,6 +22,7 @@ var getConnection = function(callback) {
     console.log("Connected successfully to server");
 
     callback(db, function() {
+      console.log("About to close the connection.");
       db.close();
     });
   });
@@ -30,7 +31,7 @@ var getConnection = function(callback) {
 var createEquity = function(equity, callback) {
   equity.id = randomString(optionsForId);
   
-  getConnection(function(db) {
+  getConnection(function(db, close_connection) {
     console.log('Creating equity');
 
     var collection = db.collection(equity_collection);
@@ -40,12 +41,13 @@ var createEquity = function(equity, callback) {
       console.log(JSON.stringify(result.ops));
       delete equity._id;
       callback(equity);
+      close_connection();
     });
   });
 };
 
 var getAllEquities = function(callback) {
-  getConnection(function(db) {
+  getConnection(function(db, close_connection) {
     var query = {}
     console.log('Retrieving all equities');
     
@@ -55,13 +57,14 @@ var getAllEquities = function(callback) {
         delete docs[doc]._id;
       }
       callback(docs);
+      close_connection();
     });
   });           
 };
 
 // Should this really be allowed?  Seems very exploitable if not controlled properly
 var getEquitiesByFilter = function(queryField, queryValue, callback) {
-  getConnection(function(db) {
+  getConnection(function(db, close_connection) {
     var query = {};
     query[queryField] = queryValue;
     console.log('Retrieving object by ' + JSON.stringify(query));
@@ -72,12 +75,13 @@ var getEquitiesByFilter = function(queryField, queryValue, callback) {
         delete docs[doc]._id;
       }
       callback(docs);
+      close_connection();
     });
   });
 };
 
 var getEquityById = function(id, callback) {
-  getConnection(function(db) {
+  getConnection(function(db, close_connection) {
     var query = null;
     
     // Allow queries by both the unique id of the record and the ticker symbol
@@ -97,26 +101,29 @@ var getEquityById = function(id, callback) {
         delete doc._id;
       }
       callback(doc);
+      close_connection();
     });
   });
 };
 
 var deleteEquity = function(id, callback) {
-  getConnection(function(db) {
+  getConnection(function(db, close_connection) {
     var collection = db.collection(equity_collection);
     collection.deleteOne({'id':id}, function(err, result) {
       console.log('Equity by id ' + id + ' has been deleted.');
       callback();
+      close_connection();
     });
   });
 };
 
 var updateEquity = function(id, params, callback) {
-  getConnection(function(db) {
+  getConnection(function(db, close_connection) {
     var collection = db.collection(equity_collection);
     collection.updateOne({'id':id}, { $set: params }, function(err, result) {
       console.log('Equity by id ' + id + ' has been updated with ' + JSON.stringify(params));
       callback();
+      close_connection();
     });
   });
 };
@@ -125,7 +132,7 @@ var updateEquity = function(id, params, callback) {
 var createSnapshot = function(snapshot, callback) {
   snapshot.id = randomString(optionsForId);
   
-  getConnection(function(db) {
+  getConnection(function(db, close_connection) {
     var collection = db.collection(snapshot_collection);
     collection.insert(snapshot, function(err, result) {
       
@@ -133,13 +140,14 @@ var createSnapshot = function(snapshot, callback) {
       console.log(JSON.stringify(result.ops));
       delete snapshot._id;
       callback(snapshot);
+      close_connection();
     });
   });
 };
 
 // Retrieves a single snapshot by id
 var getSnapshotById = function(id, callback) {
-  getConnection(function(db) {
+  getConnection(function(db, close_connection) {
     var query = {'id': id};
     console.log('Retrieving object by ' + JSON.stringify(query));
     
@@ -152,12 +160,13 @@ var getSnapshotById = function(id, callback) {
         delete doc._id;
       }
       callback(doc);
+      close_connection();
     });
   });
 };
 
 var getSnapshotsByTicker = function(ticker, limit, callback) {
-  getConnection(function(db) {
+  getConnection(function(db, close_connection) {
     var query = {'ticker': ticker};
     var options = {
       'limit': limit,
@@ -171,16 +180,18 @@ var getSnapshotsByTicker = function(ticker, limit, callback) {
         delete docs[doc]._id;
       }
       callback(docs);
+      close_connection();
     });
   });
 };
 
 var deleteSnapshotById = function(id, callback) {
-  getConnection(function(db) {
+  getConnection(function(db, close_connection) {
     var collection = db.collection(snapshot_collection);
     collection.deleteOne({'id':id}, function(err, result) {
       console.log('Snapshot by id ' + id + ' has been deleted.');
       callback();
+      close_connection();
     });
   });
 };
@@ -189,7 +200,7 @@ var deleteSnapshotById = function(id, callback) {
 var createAggregate = function(aggregate, callback) {
   aggregate.id = randomString(optionsForId);
   
-  getConnection(function(db) {
+  getConnection(function(db, close_connection) {
     var collection = db.collection(aggregate_collection);
     collection.insert(aggregate, function(err, result) {
       
@@ -197,13 +208,14 @@ var createAggregate = function(aggregate, callback) {
       console.log(JSON.stringify(result.ops));
       delete aggregate._id;
       callback(aggregate);
+      close_connection();
     });
   });
 };
 
 // Retrieves aggregates by ticker symbol - always sorting by date descending first
 var getAggregatesByTicker = function(ticker, limit, callback) {
-  getConnection(function(db) {
+  getConnection(function(db, close_connection) {
     var query = {'ticker': ticker};
     var options = {
       'limit': limit,
@@ -217,6 +229,7 @@ var getAggregatesByTicker = function(ticker, limit, callback) {
         delete docs[doc]._id;
       }
       callback(docs);
+      close_connection();
     });
   });
 };
