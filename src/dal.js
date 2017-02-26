@@ -158,7 +158,10 @@ var getSnapshotById = function(id, callback) {
 var getSnapshotsByTicker = function(ticker, limit, callback) {
   getConnection(function(db) {
     var query = {'ticker': ticker};
-    var options = {'limit': limit};
+    var options = {
+      'limit': limit,
+      'sort': [['date', 'desc']]
+    };
     console.log('Retrieving snapshots by ticker ' + ticker + ' the actual query is ' + JSON.stringify(query) + ' and the query options are ' + JSON.stringify(options));
     
     var collection = db.collection(snapshot_collection);
