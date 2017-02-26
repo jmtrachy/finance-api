@@ -1,0 +1,5 @@
+curl -v -X POST -H "Content-Type: application/json" -d '{"createdDate":"02-26-2017","date": "02-26-2017", "price": "45.00", "priceChange": "1.00", "priceChangePercent": "0.3", "dividend": "0.57", "dividendYield": "1.6700", "pe": "16.5", "ticker":"JAMES", "name":"Apple Inc.","exchange":"NASDAQ","industry":"Technology","dow":"True"}' http://localhost:5000/v1/snapshots
+
+curl -v -X POST -H "Content-Type: application/json" -d '{"createdDate":"02-25-2017","date": "02-25-2017", "price": "44.00", "priceChange": "0.50", "priceChangePercent": "0.3", "dividend": "0.57", "dividendYield": "1.6700", "pe": "16.5", "ticker":"JAMES", "name":"Apple Inc.","exchange":"NASDAQ","industry":"Technology","dow":"True"}' http://localhost:5000/v1/snapshots
+
+curl -v -X POST -H "Content-Type: application/json" -d '{"createdDate":"02-24-2017","date": "02-24-2017", "price": "43.50", "priceChange": "0.25", "priceChangePercent": "0.3", "dividend": "0.57", "dividendYield": "1.6700", "pe": "16.5", "ticker":"JAMES", "name":"Apple Inc.","exchange":"NASDAQ","industry":"Technology","dow":"True"}' http://localhost:5000/v1/snapshots
