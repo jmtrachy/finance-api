@@ -20,7 +20,7 @@ equityRouter.get('/', function(req, res) {
     if (filter != 'dow') {
       res.status(400).send(JSON.stringify({error:'The only options available for the filter parameter are: dow'}));
     } else {
-      dal.getEquitiesByFilter('dow', 'True', function(docs) {
+      dal.getEquitiesByFilter('dow', true, function(docs) {
         res.status(200).send(JSON.stringify(docs));
       });
     }
