@@ -3,8 +3,12 @@ var MongoClient = require('mongodb').MongoClient
 var assert = require('assert');
 var randomString = require('random-string');
 
-console.log('Environment is ' + process.argv[2] + '; loading config/envs/' + process.argv[2] + '.js');
-var env = require('./config/envs/' + process.argv[2] + '.js');
+var envLocation = process.argv[2];
+if (envLocation == null || envLocation == undefined || envLocation == 'undefined') {
+  envLocation = 'ci';
+}
+console.log('Environment is ' + envLocation + '; loading config/envs/' + envLocation + '.js');
+var env = require('./config/envs/' + envLocation + '.js');
 console.log('db location is ' + env.databaseLocation);
 
 var optionsForId = {
