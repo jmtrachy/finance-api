@@ -2,14 +2,9 @@ var MongoClient = require('mongodb').MongoClient
 //var mongo = require('mongodb');
 var assert = require('assert');
 var randomString = require('random-string');
+var config = require('./config/config.js');
 
-var envLocation = process.argv[2];
-if (envLocation == null || envLocation == undefined || envLocation == 'undefined') {
-  envLocation = 'ci';
-}
-console.log('Environment is ' + envLocation + '; loading config/envs/' + envLocation + '.js');
-var env = require('./config/envs/' + envLocation + '.js');
-console.log('db location is ' + env.databaseLocation);
+console.log('db location is ' + config.env.databaseLocation);
 
 var optionsForId = {
   length: 32,
@@ -19,7 +14,7 @@ var optionsForId = {
 };
 
 //var url = 'mongodb://finance.api.polarflare.com:27017/poc';
-var url = 'mongodb://' + env.databaseLocation + ':27017/poc'
+var url = 'mongodb://' + config.env.databaseLocation + ':27017/poc'
 var equity_collection = 'equities';
 var snapshot_collection = 'snapshots';
 var aggregate_collection = 'aggregates';
