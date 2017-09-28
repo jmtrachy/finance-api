@@ -5,6 +5,7 @@ var dal = require('./dal.js');
 var equityRouter = require('./routes/equities.js');
 var snapshotRouter = require('./routes/snapshots.js');
 var aggregateRouter = require('./routes/aggregates.js');
+var healthRouter = require('./routes/health.js');
 var app = express();
 
 var port = 5000;
@@ -27,6 +28,7 @@ app.use(function(req, res, next) {
 app.use('/v1/equities', equityRouter);
 app.use('/v1/snapshots', snapshotRouter);
 app.use('/v1/aggregates', aggregateRouter);
+app.use('/v1/health', healthRouter);
 
 app.listen(port, function() {
   startupMessage = 'Server started, up and listening on port ' + port;
