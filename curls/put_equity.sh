@@ -1,1 +1,0 @@
-curl -X PUT -H "Content-Type: application/json" -d '{"industry":"Technology"}' http://localhost:5000/v1/equities/DJ3M3z4pG4kyeTAsxgDynDUzvw3nsQnb
