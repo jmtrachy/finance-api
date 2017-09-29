@@ -1,0 +1,230 @@
+AAPL,Apple Inc.,NASDAQ,NULL,1
+AKAM,Akamai Technologies, Inc.,NASDAQ,NULL,0
+AXP,American Express Company,NYSE,NULL,1
+BA,Boeing Co,NYSE,NULL,1
+CAT,Caterpillar Inc.,NYSE,NULL,1
+CSCO,Cisco Systems, Inc.,NASDAQ,NULL,1
+CVX,Chevron Corporation,NYSE,NULL,1
+DD,E I Du Pont De Nemours And Co,NYSE,NULL,1
+DIS,Walt Disney Co,NYSE,NULL,1
+F,Ford Motor Company,NYSE,NULL,0
+GE,General Electric Company,NYSE,NULL,1
+GS,Goldman Sachs Group Inc,NYSE,NULL,1
+HD,Home Depot Inc,NYSE,NULL,1
+IBM,International Business Machines Corp.,NYSE,NULL,1
+INTC,Intel Corporation,NASDAQ,NULL,1
+JNJ,Johnson & Johnson,NYSE,NULL,1
+JPM,JPMorgan Chase & Co.,NYSE,NULL,1
+KO,The Coca-Cola Co,NYSE,NULL,1
+MCD,McDonalds Corporation,NYSE,NULL,1
+MMM,3M Co,NYSE,NULL,1
+MRK,Merck & Co., Inc.,NYSE,NULL,1
+MSFT,Microsoft Corporation,NASDAQ,NULL,1
+NEWR,New Relic Inc,NYSE,NULL,0
+NFLX,Netflix, Inc.,NASDAQ,NULL,0
+NKE,Nike Inc,NYSE,NULL,1
+PFE,Pfizer Inc.,NYSE,NULL,1
+PG,Procter & Gamble Co,NYSE,NULL,1
+PSX,Phillips 66,NYSE,NULL,0
+SAP,SAP SE (ADR),NYSE,NULL,0
+SVU,SUPERVALU INC.,NYSE,NULL,0
+T,AT&T Inc.,NYSE,Telecommunications Services,0
+TOT,Total SA (ADR),NYSE,NULL,0
+TRV,Travelers Companies Inc,NYSE,NULL,1
+TSLA,Tesla Motors Inc,NASDAQ,NULL,0
+UNH,UnitedHealth Group Inc,NYSE,NULL,1
+UTX,United Technologies Corporation,NYSE,NULL,1
+V,Visa Inc,NYSE,NULL,1
+VOW,Volkswagen AG,ETR,NULL,0
+VZ,Verizon Communications Inc.,NYSE,NULL,1
+WFC,Wells Fargo & Co,NYSE,NULL,0
+WMT,Wal-Mart Stores, Inc.,NYSE,NULL,1
+XOM,Exxon Mobil Corporation,NYSE,NULL,1
+CMG,Chipotle Mexican Grill, Inc.,NYSE,NULL,0
+IVV,S&P 500 Index,NYSEARCA,Conglomerate,0
+ABT,Abbott Laboratories,NYSE,Pharmaceuticals,0
+ABBV,AbbVie Inc.,NYSE,Pharmaceuticals,0
+ACN,Accenture Plc,NYSE,Business Support Services,0
+ATVI,Activision Blizzard, Inc,NASDAQ,Toys & Juvenile Products,0
+AYI,Acuity Brands, Inc.,NYSE,Lighting Fixtures,0
+ADBE,Adobe Systems Incorporated,NASDAQ,Application Software,0
+AAP,Advance Auto Parts, Inc.,NYSE,Automotive Parts & Accessories Retailers,0
+AES,AES Corp,NYSE,Electric Utilities,0
+AET,Aetna Inc,NYSE,Managed Health Care,0
+AFL,AFLAC Incorporated,NYSE,Life and Health Insurance,0
+AMG,Affiliated Managers Group, Inc.,NYSE,Investment Management & Fund Operators,0
+A,Agilent Technologies Inc,NYSE,Healthcare,0
+APD,Air Products & Chemicals, Inc.,NYSE,Basic Materials,0
+ALK,Alaska Air Group Inc,NYSE,Industrials,0
+ALB,Albemarle Corporation,NYSE,Basic Materials,0
+AA,Alcoa Inc,NYSE,Basic Materials,0
+AGN,Allergan plc Ordinary Shares,NYSE,NULL,0
+LNT,Alliant Energy Corp.,NYSE,Utilities,0
+ALXN,Alexion Pharmaceuticals, Inc.,NASDAQ,Healthcare,0
+ALLE,Allegion,NYSE,Technology,0
+ADS,Alliance Data Systems,NYSE,Industrials,0
+ALL,Allstate Corp,NYSE,Financials,0
+GOOG,Alphabet Inc Class C,NASDAQ,Technology,0
+MO,Altria Group Inc,NYSE,Non-Cyclical Consumer Goods & Services,0
+AMZN,Amazon.com Inc,NASDAQ,Technology,0
+AEE,Ameren Corp,NYSE,Utilities,0
+AAL,American Airlines Group,NASDAQ,Industrials,0
+AEP,American Electric Power,NYSE,Utilities,0
+AIG,American International Group, Inc.,NYSE,Financials,0
+AMT,American Tower Corp A,NYSE,Financials,0
+AWK,American Water Works Company Inc,NYSE,Utilities,0
+AMP,Ameriprise Financial,NYSE,Financials,0
+ABC,AmerisourceBergen Corp,NYSE,Non-Cyclical Consumer Goods & Services,0
+AME,Ametek,NYSE,Industrials,0
+AMGN,Amgen Inc,NASDAQ,Healthcare,0
+APH,Amphenol Corp A,NYSE,Technology,0
+APC,Anadarko Petroleum Corp,NYSE,Energy,0
+ADI,Analog Devices, Inc.,NASDAQ,Technology,0
+AON,Aon plc Class A Ordinary Shares (UK),NYSE,Financials,0
+APA,Apache Corporation,NYSE,Energy,0
+AIV,Apartment Investment & Mgmt,NYSE,Financials,0
+AMAT,Applied Materials Inc,NASDAQ,Technology,0
+ADM,Archer-Daniels-Midland Co,NYSE,Non-Cyclical Consumer Goods & Services,0
+AJG,Arthur J. Gallagher & Co.,NYSE,Financials,0
+AIZ,Assurant Inc,NYSE,Financials,0
+ADSK,Autodesk Inc,NASDAQ,Technology,0
+ADP,Automatic Data Processing,NASDAQ,Industrials,0
+AN,AutoNation Inc,NYSE,Cyclical Consumer Goods & Services,0
+AZO,AutoZone Inc,NYSE,Cyclical Consumer Goods & Services,0
+AVGO,Broadcom Ltd,NASDAQ,Technology,0
+AVB,AvalonBay Communities, Inc.,NYSE,Financials,0
+AVY,Avery Dennison Corp,NYSE,Industrials,0
+BHI,Baker Hughes Inc,NYSE,Energy,0
+BLL,Ball Corporation,NYSE,Basic Materials,0
+BAC,Bank of America Corp,NYSE,Financials,0
+BK,The Bank of New York Mellon Corp.,NYSE,Financials,0
+BCR,Bard (C.R.) Inc.,NYSE,Healthcare,0
+BAX,Baxter International Inc.,NYSE,Healthcare,0
+BBT,BB&T Corporation,NYSE,Financials,0
+BDX,Becton Dickinson,NYSE,Healthcare,0
+BBBY,Bed Bath & Beyond,NASDAQ,Cyclical Consumer Goods & Services,0
+BRK.B,Berkshire Hathaway,NYSE,Financials,0
+BBY,Best Buy Co. Inc.,NYSE,Cyclical Consumer Goods & Services,0
+BIB,ProShares Ultra Nasdaq Biotechnology ETF,NASDAQ,Financials,0
+BLK,BlackRock,NYSE,Financials,0
+HRB,Block H&R,NYSE,Non-Cyclical Consumer Goods & Services,0
+BWA,BorgWarner,NYSE,Cyclical Consumer Goods & Services,0
+BXP,Boston Properties,NYSE,Financials,0
+BSX,Boston Scientific,NYSE,Healthcare,0
+BMY,Bristol-Myers Squibb,NYSE,Healthcare,0
+BF.B,Brown-Forman Corporation,NYSE,Non-Cyclical Consumer Goods & Services,0
+CHRW,C. H. Robinson Worldwide,NASDAQ,Industrials,0
+CA,CA, Inc.,NASDAQ,Technology,0
+COG,Cabot Oil & Gas,NYSE,Energy,0
+CPB,Campbell Soup,NYSE,Non-Cyclical Consumer Goods & Services,0
+COF,Capital One Financial,NYSE,Financials,0
+CAH,Cardinal Health Inc.,NYSE,Non-Cyclical Consumer Goods & Services,0
+HSIC,Henry Schein,NASDAQ,Healthcare,0
+KMX,Carmax Inc,NYSE,Cyclical Consumer Goods & Services,0
+CCL,Carnival Corp.,NYSE,Cyclical Consumer Goods & Services,0
+CBG,CBRE Group,NYSE,Financials,0
+CBS,CBS Corp.,NYSE,Cyclical Consumer Goods & Services,0
+CELG,Celgene Corp.,NASDAQ,Healthcare,0
+CNC,Centene Corporation,NYSE,Healthcare,0
+CNP,CenterPoint Energy,NYSE,Utilities,0
+CTL,CenturyLink Inc,NYSE,Telecommunications Services,0
+CERN,Cerner,NASDAQ,Healthcare,0
+CF,CF Industries Holdings Inc,NYSE,Basic Materials,0
+SCHW,Charles Schwab Corporation,NYSE,Financials,0
+CHK,Chesapeake Energy,NYSE,Energy,0
+CB,Chubb Limited,NYSE,Financials,0
+CHD,Church & Dwight,NYSE,Non-Cyclical Consumer Goods & Services,0
+CI,CIGNA Corp.,NYSE,Healthcare,0
+XEC,Cimarex Energy,NYSE,Energy,0
+CINF,Cincinnati Financial,NASDAQ,Financials,0
+CTAS,Cintas Corporation,NYSE,Industrials,0
+C,Citigroup,NYSE,Financials,0
+CTXS,Citrix Systems,NASDAQ,Technology,0
+CLX,The Clorox Company,NYSE,Non-Cyclical Consumer Goods & Services,0
+CME,CME Group Inc.,NASDAQ,Financials,0
+CMS,CMS Energy,NYSE,Utilities,0
+COH,Coach Inc.,NYSE,Cyclical Consumer Goods & Services,0
+CTSH,Cognizant Technology Solutions,NASDAQ,Technology,0
+CL,Colgate-Palmolive,NYSE,Non-Cyclical Consumer Goods & Services,0
+CMCSA,Comcast A Corp,NASDAQ,Cyclical Consumer Goods & Services,0
+CMA,Comerica Inc.,NYSE,Financials,0
+CAG,ConAgra Foods Inc.,NYSE,Non-Cyclical Consumer Goods & Services,0
+CXO,Concho Resources,NYSE,Energy,0
+COP,ConocoPhillips,NYSE,Energy,0
+ED,Consolidated Edison,NYSE,Utilities,0
+STZ,Constellation Brands,NYSE,Non-Cyclical Consumer Goods & Services,0
+GLW,Corning Inc.,NYSE,Technology,0
+COST,Costco Co.,NASDAQ,Cyclical Consumer Goods & Services,0
+CCI,Crown Castle International Corp.,NYSE,Financials,0
+CSRA,CSRA Inc.,NYSE,Technology,0
+CSX,CSX Corp.,NYSE,Industrials,0
+CMI,Cummins Inc.,NYSE,Cyclical Consumer Goods & Services,0
+CVS,CVS Health,NYSE,Non-Cyclical Consumer Goods & Services,0
+DHI,D. R. Horton,NYSE,Cyclical Consumer Goods & Services,0
+DHR,Danaher Corp.,NYSE,Industrials,0
+DRI,Darden Restaurants,NYSE,Cyclical Consumer Goods & Services,0
+DVA,DaVita HealthCare Partners Inc,NYSE,Healthcare,0
+DE,Deere & Co.,NYSE,Industrials,0
+DLPH,Delphi Automotive,NYSE,Cyclical Consumer Goods & Services,0
+DAL,Delta Air Lines,NYSE,Industrials,0
+XRAY,Dentsply Sirona,NASDAQ,Healthcare,0
+DVN,Devon Energy Corp.,NYSE,Energy,0
+DO,Diamond Offshore Drilling,NYSE,Energy,0
+DLR,Digital Realty Trust,NYSE,Financials,0
+DFS,Discover Financial Services,NYSE,Financials,0
+DISCA,Discovery Communications Inc.,NASDAQ,Cyclical Consumer Goods & Services,0
+DG,Dollar General,NYSE,Cyclical Consumer Goods & Services,0
+DLTR,Dollar Tree,NASDAQ,Cyclical Consumer Goods & Services,0
+D,Dominion Resources,NYSE,Utilities,0
+DOV,Dover Corp.,NYSE,Industrials,0
+DOW,Dow Chemical,NYSE,Basic Materials,0
+DPS,Dr Pepper Snapple Group,NYSE,Non-Cyclical Consumer Goods & Services,0
+DTE,DTE Energy Co.,NYSE,Utilities,0
+DUK,Duke Energy,NYSE,Utilities,0
+DNB,Dun & Bradstreet,NYSE,Industrials,0
+ETFC,ETrade,NASDAQ,Financials,0
+EMN,Eastman Chemical,NYSE,Basic Materials,0
+ETN,Eaton Corporation,NYSE,Industrials,0
+EBAY,eBay Inc.,NYSE,Technology,0
+ECL,Ecolab Inc.,NYSE,Industrials,0
+EIX,Edison Intl,NYSE,Utilities,0
+EW,Edwards Lifesciences,NYSE,Healthcare,0
+EA,Electronic Arts,NASDAQ,Cyclical Consumer Goods & Services,0
+EMR,Emerson Electric Company,NYSE,Industrials,0
+ENDP,Endo International,NASDAQ,Healthcare,0
+ETR,Entergy Corp.,NYSE,Utilities,0
+EOG,EOG Resources,NYSE,Energy,0
+EQT,EQT Corporation,NYSE,Energy,0
+EFX,Equifax Inc.,NYSE,Industrials,0
+EQIX,Equinix,NASDAQ,Financials,0
+EQR,Equity Residential,NYSE,Financials,0
+ESS,Essex Property Trust Inc,NYSE,Financials,0
+EL,Estee Lauder Cos.,NYSE,Non-Cyclical Consumer Goods & Services,0
+ES,Eversource Energy,NYSE,Utilities,0
+EXC,Exelon Corp.,NYSE,Utilities,0
+EXPE,Expedia Inc.,NASDAQ,Cyclical Consumer Goods & Services,0
+EXPD,Expeditors Intl,NASDAQ,Industrials,0
+ESRX,Express Scripts,NASDAQ,Healthcare,0
+EXR,Extra Space Storage,NYSE,Financials,0
+FFIV,F5 Networks,NASDAQ,Technology,0
+FB,Facebook,NASDAQ,Technology,0
+FAST,Fastenal Co,NASDAQ,Industrials,0
+FRT,Federal Realty Investment Trust,NYSE,Financials,0
+FDX,FedEx Corporation,NYSE,Industrials,0
+FIS,Fidelity National Information Services,NYSE,Financials,0
+FITB,Fifth Third Bancorp,NASDAQ,Financials,0
+FSLR,First Solar Inc,NASDAQ,Energy,0
+FE,FirstEnergy Corp,NYSE,Utilities,0
+FISV,Fiserv Inc,NASDAQ,Industrials,0
+FLIR,FLIR Systems,NASDAQ,Technology,0
+FLS,Flowserve Corporation,NYSE,Industrials,0
+FLR,Fluor Corp.,NYSE,Industrials,0
+FMC,FMC Corporation,NYSE,Basic Materials,0
+FTI,FMC Technologies Inc.,NYSE,Energy,0
+FL,Foot Locker Inc,NYSE,Cyclical Consumer Goods & Services,0
+FBHS,Fortune Brands Home and Security,NYSE,Cyclical Consumer Goods & Services,0
+BEN,Franklin Resources,NYSE,Financials,0
+FCX,Freeport-McMoran Cp and Gld,NYSE,Basic Materials,0
+FTR,Frontier Communications,NASDAQ,Telecommunication Services,0
+TRI,Thomson Reuters Corp,NYSE,Financials,0
+SNAP,Snap Inc,NYSE,Technology,0
