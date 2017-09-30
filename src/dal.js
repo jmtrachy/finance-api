@@ -32,7 +32,9 @@ var getConnection = function(callback) {
 };
 
 var createEquity = function(equity, callback) {
-  equity.id = randomString(optionsForId);
+  if (equity.id === undefined) {
+    equity.id = randomString(optionsForId);
+  }
   
   getConnection(function(db, close_connection) {
     console.log('Creating equity');
@@ -87,12 +89,8 @@ var getEquityById = function(id, callback) {
   getConnection(function(db, close_connection) {
     var query = null;
     
-    // Allow queries by both the unique id of the record and the ticker symbol
-    if (id.length == 32) {
-      query = {'id': id};
-    } else {
-      query = {'ticker': id.toUpperCase()};
-    }
+    // Modified - only allow deletes by id now.
+    query = {'id': id};
     console.log('Retrieving object by ' + JSON.stringify(query));
     
     var collection = db.collection(equity_collection);
@@ -168,14 +166,14 @@ var getSnapshotById = function(id, callback) {
   });
 };
 
-var getSnapshotsByTicker = function(ticker, limit, callback) {
+var getSnapshotsByTicker = function(equityId, limit, callback) {
   getConnection(function(db, close_connection) {
-    var query = {'ticker': ticker};
+    var query = {'equityId': equityId};
     var options = {
       'limit': limit,
       'sort': [['date', 'desc']]
     };
-    console.log('Retrieving snapshots by ticker ' + ticker + ' the actual query is ' + JSON.stringify(query) + ' and the query options are ' + JSON.stringify(options));
+    console.log('Retrieving snapshots by equity id ' + equityId + ' the actual query is ' + JSON.stringify(query) + ' and the query options are ' + JSON.stringify(options));
     
     var collection = db.collection(snapshot_collection);
     collection.find(query, options).toArray(function(err, docs) {

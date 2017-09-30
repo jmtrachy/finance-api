@@ -9,6 +9,8 @@ snapshotRouter.use(function(req, res, next) {
 });
 
 snapshotRouter.get('/', function(req, res) {
+  var equityId = req.params.equityId;
+  console.log('equity id = ' + equityId);
   var ticker = req.query.ticker;
   if (!ticker) {
     res.status(400).send(JSON.stringify({error:"'ticker' is a required query parameter."}));
