@@ -58,7 +58,7 @@ equityRouter.post('/', function(req, res) {
 });
 
 // Route for updating parts of an equity
-equityRouter.put('/:id', function(req, res) {
+equityRouter.patch('/:id', function(req, res) {
   var reqBody = req.body;
   var id = req.params.id;
   console.log('Put called for document ' + id + ' and payload ' + JSON.stringify(reqBody));
