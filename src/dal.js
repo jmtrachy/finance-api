@@ -89,9 +89,13 @@ var getEquityById = function(id, callback) {
   getConnection(function(db, close_connection) {
     var query = null;
     
-    // Modified - only allow deletes by id now.
-    query = {'id': id};
-    console.log('Retrieving object by ' + JSON.stringify(query));
+    if (id.length > 15) {
+      query = {'id': id};
+      console.log('Retrieving object by data store id ' + JSON.stringify(query));
+    } else {
+      query = {'ticker': id};
+      console.log('Retrieving object by ticker ' + JSON.stringify(query));
+    }
     
     var collection = db.collection(equity_collection);
     collection.find(query).toArray(function(err, docs) {
@@ -166,14 +170,22 @@ var getSnapshotById = function(id, callback) {
   });
 };
 
-var getSnapshotsByTicker = function(equityId, limit, callback) {
+var getSnapshotsByEquity = function(id, limit, callback) {
   getConnection(function(db, close_connection) {
-    var query = {'equityId': equityId};
+    var query = {};
+    
+    if (id.length > 15) {
+      query = {'equityId': id};
+      console.log('Retrieving object by data store id ' + JSON.stringify(query));
+    } else {
+      query = {'ticker': id};
+      console.log('Retrieving object by ticker ' + JSON.stringify(query));
+    }
+    
     var options = {
       'limit': limit,
       'sort': [['date', 'desc']]
     };
-    console.log('Retrieving snapshots by equity id ' + equityId + ' the actual query is ' + JSON.stringify(query) + ' and the query options are ' + JSON.stringify(options));
     
     var collection = db.collection(snapshot_collection);
     collection.find(query, options).toArray(function(err, docs) {
@@ -247,7 +259,7 @@ module.exports = {
   // Snapshots
   createSnapshot: createSnapshot,
   getSnapshotById: getSnapshotById,
-  getSnapshotsByTicker: getSnapshotsByTicker,
+  getSnapshotsByEquity: getSnapshotsByEquity,
   deleteSnapshotById: deleteSnapshotById,
   
   // Aggregates

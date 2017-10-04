@@ -113,12 +113,13 @@ equityRouter.delete('/:id', function(req, res) {
   }
 });
 
-equityRouter.get('/:equityId/snapshots', function(req, res) {
-  var equityId = req.params.equityId;
-  console.log('equity id = ' + equityId);
-  if (!equityId) {
-    res.status(400).send(JSON.stringify({error:"'equityId' is a required path parameter. (example: /v1/equities/AAPL/snapshots)"}));
+equityRouter.get('/:id/snapshots', function(req, res) {
+  var id = req.params.id;
+  console.log('id = ' + id);
+  if (!id) {
+    res.status(400).send(JSON.stringify({error:"'id' is a required path parameter. (example: /v1/equities/AAPL/snapshots)"}));
   } else {
+    // Make sure numResults is a valid number
     var numResults = req.query.limit;
     console.log('numResults = ' + numResults);
     if (typeof numResults === 'undefined') {
@@ -126,22 +127,31 @@ equityRouter.get('/:equityId/snapshots', function(req, res) {
     } else {
       numResults = Number(numResults);
     }
-    dal.getSnapshotsByTicker(equityId, numResults, function(docs) {
+    
+    dal.getSnapshotsByEquity(id, numResults, function(docs) {
       console.log(docs)
       if (docs.length > 0) {
         res.status(200).send(JSON.stringify(docs));
       } else {
-        res.status(404).send('{"errorMessage": "snapshots not found for equity ' + equityId + '"}');
+        res.status(404).send('{"errorMessage": "snapshots not found for equity ' + id + '"}');
       }
     });
   } 
 });
 
 // Route for creating an equity snapshot
-equityRouter.post('/:equityId/snapshots', function(req, res) {
+equityRouter.post('/:id/snapshots', function(req, res) {
   var reqBody = req.body;
   console.log('Post called with ' + JSON.stringify(reqBody));
-  reqBody.equityId = req.params.equityId;
+  
+  id = req.params.id;
+  if (id.length > 15) {
+    reqBody.equityId = id;
+    reqBody.ticker = 'AAPL'; // TODO: Remove this obvious hack
+  } else {
+    reqBody.equityId = 'Brg1g51mUmIVcDM28PAP3dnhoG3O78us'; // TODO: Remove this obvious hack
+    reqBody.ticker = id;
+  }
   
   if (!reqBody.id) {
     dal.createSnapshot(reqBody, function(snapshot) {
