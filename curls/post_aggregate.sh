@@ -1,1 +1,1 @@
-curl -v -X POST -H "Content-Type: application/json" -d '{"createdDate":"10-13-2016","date": "02-26-2017", "ticker":"JAMES", "fiftyDayMovingAverage": 50.01, "fiftyDayVolatilityAverage": 0.43, "perOffRecentHigh": 8.0, "perOffRecentLow": 3.4}' http://localhost:5000/v1/aggregates
+curl -v -X POST -H "Content-Type: application/json" -d '{"createdDate":"10-13-2016","date": "02-26-2017", "fiftyDayMovingAverage": 50.01, "fiftyDayVolatilityAverage": 0.43, "perOffRecentHigh": 8.0, "perOffRecentLow": 3.4}' http://localhost:5000/v1/equities/AAPL/aggregates

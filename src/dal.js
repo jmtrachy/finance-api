@@ -227,14 +227,23 @@ var createAggregate = function(aggregate, callback) {
 };
 
 // Retrieves aggregates by ticker symbol - always sorting by date descending first
-var getAggregatesByTicker = function(ticker, limit, callback) {
+var getAggregatesByEquity = function(id, limit, callback) {
   getConnection(function(db, close_connection) {
-    var query = {'ticker': ticker};
+    var query = {};
+    if (id.length > 15) {
+      query = {'equityId': id};
+      console.log('Retrieving object by data store id ' + JSON.stringify(query));
+    } else {
+      query = {'ticker': id.toUpperCase()};
+      console.log('Retrieving object by ticker ' + JSON.stringify(query));
+    }
+    
     var options = {
       'limit': limit,
       'sort': [['date', 'desc']]
     };
-    console.log('Retrieving aggregates by ticker ' + ticker + ' the actual query is ' + JSON.stringify(query) + ' and the query options are ' + JSON.stringify(options));
+    
+    console.log('Retrieving aggregates by ticker ' + id + ' the actual query is ' + JSON.stringify(query) + ' and the query options are ' + JSON.stringify(options));
     
     var collection = db.collection(aggregate_collection);
     collection.find(query, options).toArray(function(err, docs) {
@@ -264,5 +273,5 @@ module.exports = {
   
   // Aggregates
   createAggregate: createAggregate,
-  getAggregatesByTicker: getAggregatesByTicker
+  getAggregatesByEquity: getAggregatesByEquity
 };

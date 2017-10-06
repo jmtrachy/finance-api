@@ -1,1 +1,1 @@
-curl "http://localhost:5000/v1/aggregates?ticker=james&limit=1"
+curl http://localhost:5000/v1/equities/AAPL/aggregates

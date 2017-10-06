@@ -27,7 +27,7 @@ app.use(function(req, res, next) {
 
 app.use('/v1/equities', equityRouter);
 //app.use('/v1/equities/:equityId/snapshots', snapshotRouter);
-app.use('/v1/aggregates', aggregateRouter);
+//app.use('/v1/aggregates', aggregateRouter);
 app.use('/v1/health', healthRouter);
 
 app.listen(port, function() {

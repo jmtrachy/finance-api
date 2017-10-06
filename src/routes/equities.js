@@ -200,4 +200,49 @@ equityRouter.delete('/:equityId/snapshots/:id', function(req, res) {
   }
 });
 
+// Retrieves aggregates based on a ticker symbol
+equityRouter.get('/:id/aggregates', function(req, res) {
+  var id = req.params.id;
+  if (!id) {
+    res.status(400).send(JSON.stringify({error:"'id' is a required path parameter. It can either be a ticker symbol or an equity id"}));
+  } else {
+    
+    var numResults = req.query.limit;
+    console.log('numResults = ' + numResults);
+    if (typeof numResults === 'undefined') {
+      numResults = 1;
+    } else {
+      numResults = Number(numResults);
+    }
+    
+    dal.getAggregatesByEquity(id, numResults, function(docs) {
+      res.status(200).send(JSON.stringify(docs));
+    });
+  } 
+});
+
+// Route for creating an equity
+equityRouter.post('/:id/aggregates', function(req, res) {
+  var reqBody = req.body;  
+  id = req.params.id.toUpperCase();
+  
+  if (id.length > 15) {
+    reqBody.equityId = id;
+    reqBody.ticker = 'AAPL'; // TODO: Remove this obvious hack
+  } else {
+    reqBody.equityId = 'Brg1g51mUmIVcDM28PAP3dnhoG3O78us'; // TODO: Remove this obvious hack
+    reqBody.ticker = id;
+  }
+  
+  console.log('Post called with ' + JSON.stringify(reqBody));
+  
+  if (!reqBody.id) {
+    dal.createAggregate(reqBody, function(aggregate) {
+      res.end(JSON.stringify(aggregate));
+    });
+  } else {
+    res.status(400).send('{ "error": "Update not supported yet" }');
+  }  
+});
+
 module.exports = equityRouter;
