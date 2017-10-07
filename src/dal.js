@@ -256,6 +256,37 @@ var getAggregatesByEquity = function(id, limit, callback) {
   });
 };
 
+// Retrieves a single aggregate by id
+var getAggregateById = function(id, callback) {
+  getConnection(function(db, close_connection) {
+    var query = {'id': id};
+    console.log('Retrieving object by ' + JSON.stringify(query));
+    
+    var collection = db.collection(aggregate_collection);
+    collection.find(query).toArray(function(err, docs) {
+      var doc = docs.length > 0 ? docs[0] : null;
+      console.log("Retrieved the following records from the database");
+      console.log(doc == null ? 'None found' : doc);
+      if (doc != null) {
+        delete doc._id;
+      }
+      callback(doc);
+      close_connection();
+    });
+  });
+};
+
+var deleteAggregateById = function(id, callback) {
+  getConnection(function(db, close_connection) {
+    var collection = db.collection(aggregate_collection);
+    collection.deleteOne({'id':id}, function(err, result) {
+      console.log('Aggregate by id ' + id + ' has been deleted.');
+      callback();
+      close_connection();
+    });
+  });
+};
+
 module.exports = {
   // Equities
   getAllEquities: getAllEquities,
@@ -273,5 +304,7 @@ module.exports = {
   
   // Aggregates
   createAggregate: createAggregate,
-  getAggregatesByEquity: getAggregatesByEquity
+  getAggregateById: getAggregateById,
+  getAggregatesByEquity: getAggregatesByEquity,
+  deleteAggregateById: deleteAggregateById
 };

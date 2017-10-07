@@ -221,17 +221,33 @@ equityRouter.get('/:id/aggregates', function(req, res) {
   } 
 });
 
-// Route for creating an equity
+// Route for retrieving an aggregate by Id
+equityRouter.get('/:equityId/aggregates/:id', function(req, res) {
+  dal.getAggregateById(req.params.id, function(doc){
+    
+    if (doc != null) {
+      res.status(200).send(JSON.stringify(doc));  
+    } else {
+      var errorMessage = {
+        error: 'No snapshot found with id ' + req.params.id
+      }
+      res.status(404).send(errorMessage);
+    }
+    
+  });
+});
+
+// Route for creating an aggregate
 equityRouter.post('/:id/aggregates', function(req, res) {
   var reqBody = req.body;  
-  id = req.params.id.toUpperCase();
+  id = req.params.id;
   
   if (id.length > 15) {
     reqBody.equityId = id;
     reqBody.ticker = 'AAPL'; // TODO: Remove this obvious hack
   } else {
     reqBody.equityId = 'Brg1g51mUmIVcDM28PAP3dnhoG3O78us'; // TODO: Remove this obvious hack
-    reqBody.ticker = id;
+    reqBody.ticker = id.toUpperCase();
   }
   
   console.log('Post called with ' + JSON.stringify(reqBody));
@@ -243,6 +259,29 @@ equityRouter.post('/:id/aggregates', function(req, res) {
   } else {
     res.status(400).send('{ "error": "Update not supported yet" }');
   }  
+});
+
+// Delete an aggregate
+equityRouter.delete('/:equityId/aggregates/:id', function(req, res) {
+  equityId = req.params.equityId
+  id = req.params.id;
+  
+  console.log('Delete called for equity ' + equityId + ' and aggregate ' + id);
+  
+  if (id == null) {
+    responseMessage = { "error": "An id must be passed in to identify the individual resource."};
+    res.status(400).send(JSON.stringify(responseMessage));
+  } else {
+    dal.getAggregateById(id, function(doc) {
+      if (doc == null) {
+        res.status(404).send(JSON.stringify({ "error": "No resource found."}));
+      } else {
+        dal.deleteAggregateById(id, function() {
+          res.sendStatus(204);
+        });
+      }
+    });
+  }
 });
 
 module.exports = equityRouter;

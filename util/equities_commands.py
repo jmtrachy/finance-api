@@ -65,6 +65,35 @@ def post_equity(equity):
 
     print('{} - created id = {}'.format(response_status_code, response_data.get('id')))
 
+def get_all_snapshots_for_equity(ticker):
+    conn = http.client.HTTPConnection('localhost', 5000)
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    conn.request('GET', '/v1/equities/{}/snapshots?limit=100000'.format(ticker), None, headers)
+
+    raw_response = conn.getresponse()
+    print('received a {} from the server'.format(raw_response.status))
+
+    snapshots = json.loads(raw_response.read().decode('utf-8'))
+    conn.close()
+    return snapshots
+
+def get_all_aggregates_for_equity(ticker):
+    conn = http.client.HTTPConnection('localhost', 5000)
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    conn.request('GET', '/v1/equities/{}/aggregates?limit=100000'.format(ticker), None, headers)
+
+    raw_response = conn.getresponse()
+    print('received a {} from the server'.format(raw_response.status))
+
+    aggregates = json.loads(raw_response.read().decode('utf-8'))
+    conn.close()
+    return aggregates
 
 def get_all_equities():
     conn = http.client.HTTPConnection('localhost', 5000)
@@ -81,7 +110,6 @@ def get_all_equities():
     conn.close()
     return equities
 
-
 def delete_equity(equity):
     conn = http.client.HTTPConnection('localhost', 5000)
     headers = {
@@ -94,6 +122,17 @@ def delete_equity(equity):
     conn.close()
     print('deleted {} - {} from the database'.format(equity.get('ticker'), equity.get('id')))
 
+def delete_snapshot(snapshot):
+    conn = http.client.HTTPConnection('localhost', 5000)
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    conn.request('DELETE', '/v1/equities/{}/snapshot/{}'.format(snapshot.get('ticker'), snapshot.get('id')), None, headers)
+
+    raw_response = conn.getresponse()
+    conn.close()
+    print('received a {} response from the database deleting {} - snapshot {}'.format(raw_response.status, snapshot.get('ticker'), snapshot.get('id')))
 
 def delete_equities_from_database():
     equities = get_all_equities()
@@ -101,17 +140,32 @@ def delete_equities_from_database():
         delete_equity(equity)
         #print('Equity {} has an id of {}'.format(equity.get('ticker'), equity.get('id')))
 
-
 def load_equities():
     equities = get_existing_equities()
     for equity in equities:
         post_equity(equity)
 
+def delete_snapshots_for_equity(ticker):
+    snapshots = get_all_snapshots_for_equity(ticker)
+    for snapshot in snapshots:
+        delete_snapshot(snapshot)
+
+def delete_aggregates_for_equity(ticker):
+    aggregates = get_all_aggregates_for_equity(ticker)
+    for aggregate in aggregates:
+        delete_aggregate(aggregate)
+
+def delete_everything():
+    equities = get_existing_equities()
+    for equity in equities:
+        delete_snapshots_for_equity(equity.get('ticker'))
+        delete_aggregates_for_equity(equity.get('ticker'))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Gathering arguments')
     parser.add_argument('-l', required=False, dest='load', action='store', help='Load all the equities from equities.csv')
     parser.add_argument('-d', required=False, dest='delete', action='store', help='Deletes ALL equities from the database')
+    parser.add_argument('-x', required=False, dest='delete_all', action='store', help='Deletes all EVERYTHING from the database')
     args = parser.parse_args()
 
     if args.load == 'true':
@@ -122,3 +176,7 @@ if __name__ == '__main__':
             delete_equities_from_database()
         else:
             print('Phew - that was a close one')
+    elif args.delete_all == 'true':
+        user_input = input('This will delete EVERYTHING from the database. Are you sure you\'d like to continue? (Y/N) [N]: ')
+        if user_input == 'Y':
+            print('about to delete stuff')
