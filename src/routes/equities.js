@@ -130,11 +130,7 @@ equityRouter.get('/:id/snapshots', function(req, res) {
     
     dal.getSnapshotsByEquity(id, numResults, function(docs) {
       console.log(docs)
-      if (docs.length > 0) {
-        res.status(200).send(JSON.stringify(docs));
-      } else {
-        res.status(404).send('{"errorMessage": "snapshots not found for equity ' + id + '"}');
-      }
+      res.status(200).send(JSON.stringify(docs));
     });
   } 
 });

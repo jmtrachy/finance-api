@@ -128,11 +128,26 @@ def delete_snapshot(snapshot):
         'Content-Type': 'application/json',
         'Accept': 'application/json'
     }
-    conn.request('DELETE', '/v1/equities/{}/snapshot/{}'.format(snapshot.get('ticker'), snapshot.get('id')), None, headers)
+    conn.request('DELETE', '/v1/equities/{}/snapshots/{}'.format(snapshot.get('ticker'), snapshot.get('id')), None, headers)
 
     raw_response = conn.getresponse()
     conn.close()
-    print('received a {} response from the database deleting {} - snapshot {}'.format(raw_response.status, snapshot.get('ticker'), snapshot.get('id')))
+    print('received a {} response from the database deleting {} - aggregate {}'.format(raw_response.status, snapshot.get('ticker'), snapshot.get('id')))
+
+def delete_aggregate(aggregate):
+    conn = http.client.HTTPConnection('localhost', 5000)
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    conn.request('DELETE', '/v1/equities/{}/aggregates/{}'.format(aggregate.get('ticker'), aggregate.get('id')), None,
+                 headers)
+
+    raw_response = conn.getresponse()
+    conn.close()
+    print('received a {} response from the database deleting {} - snapshot {}'.format(raw_response.status,
+                                                                                      aggregate.get('ticker'),
+                                                                                      aggregate.get('id')))
 
 def delete_equities_from_database():
     equities = get_all_equities()
@@ -156,10 +171,12 @@ def delete_aggregates_for_equity(ticker):
         delete_aggregate(aggregate)
 
 def delete_everything():
-    equities = get_existing_equities()
+    equities = get_all_equities()
     for equity in equities:
-        delete_snapshots_for_equity(equity.get('ticker'))
-        delete_aggregates_for_equity(equity.get('ticker'))
+        ticker = equity.get('ticker')
+        delete_snapshots_for_equity(ticker)
+        delete_aggregates_for_equity(ticker)
+        delete_equity(equity)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Gathering arguments')
@@ -180,3 +197,4 @@ if __name__ == '__main__':
         user_input = input('This will delete EVERYTHING from the database. Are you sure you\'d like to continue? (Y/N) [N]: ')
         if user_input == 'Y':
             print('about to delete stuff')
+            delete_everything()
