@@ -1,10 +1,10 @@
 var MongoClient = require('mongodb').MongoClient
-//var mongo = require('mongodb');
 var assert = require('assert');
 var randomString = require('random-string');
 var config = require('./config/config.js');
+var logger = require('./logger.js');
 
-console.log('db location is ' + config.env.databaseLocation);
+logger.log('db location is ' + config.env.databaseLocation);
 
 var optionsForId = {
   length: 32,
@@ -21,11 +21,14 @@ var aggregate_collection = 'aggregates';
 
 var getConnection = function(callback) {
   MongoClient.connect(url, function(err, db) {
+    if (err) {
+      logger.log('err = ' + err);
+    }
     assert.equal(null, err);
-    console.log("Connected successfully to server");
+    logger.log("Connected successfully to mongo");
 
     callback(db, function() {
-      console.log("About to close the connection.");
+      logger.log("About to close the connection.");
       db.close();
     });
   });
@@ -37,13 +40,13 @@ var createEquity = function(equity, callback) {
   }
   
   getConnection(function(db, close_connection) {
-    console.log('Creating equity');
+    logger.log('Creating equity');
 
     var collection = db.collection(equity_collection);
     collection.insert(equity, function(err, result) {
       
-      console.log(JSON.stringify(result.result));
-      console.log(JSON.stringify(result.ops));
+      logger.log(JSON.stringify(result.result));
+      logger.log(JSON.stringify(result.ops));
       delete equity._id;
       callback(equity);
       close_connection();
@@ -54,7 +57,7 @@ var createEquity = function(equity, callback) {
 var getAllEquities = function(callback) {
   getConnection(function(db, close_connection) {
     var query = {}
-    console.log('Retrieving all equities');
+    logger.log('Retrieving all equities');
     
     var collection = db.collection(equity_collection);
     collection.find(query).toArray(function(err, docs) {
@@ -72,7 +75,7 @@ var getEquitiesByFilter = function(queryField, queryValue, callback) {
   getConnection(function(db, close_connection) {
     var query = {};
     query[queryField] = queryValue;
-    console.log('Retrieving object by ' + JSON.stringify(query));
+    logger.log('Retrieving object by ' + JSON.stringify(query));
     
     var collection = db.collection(equity_collection);
     collection.find(query).toArray(function(err, docs) {
@@ -91,17 +94,17 @@ var getEquityById = function(id, callback) {
     
     if (id.length > 15) {
       query = {'id': id};
-      console.log('Retrieving object by data store id ' + JSON.stringify(query));
+      logger.log('Retrieving object by data store id ' + JSON.stringify(query));
     } else {
       query = {'ticker': id};
-      console.log('Retrieving object by ticker ' + JSON.stringify(query));
+      logger.log('Retrieving object by ticker ' + JSON.stringify(query));
     }
     
     var collection = db.collection(equity_collection);
     collection.find(query).toArray(function(err, docs) {
       var doc = docs.length > 0 ? docs[0] : null;
-      console.log("Retrieved the following records from the database");
-      console.log(doc == null ? 'None found' : doc);
+      logger.log("Retrieved the following records from the database");
+      logger.log(doc == null ? 'None found' : doc);
       if (doc != null) {
         delete doc._id;
       }
@@ -115,7 +118,7 @@ var deleteEquity = function(id, callback) {
   getConnection(function(db, close_connection) {
     var collection = db.collection(equity_collection);
     collection.deleteOne({'id':id}, function(err, result) {
-      console.log('Equity by id ' + id + ' has been deleted.');
+      logger.log('Equity by id ' + id + ' has been deleted.');
       callback();
       close_connection();
     });
@@ -126,7 +129,7 @@ var updateEquity = function(id, params, callback) {
   getConnection(function(db, close_connection) {
     var collection = db.collection(equity_collection);
     collection.updateOne({'id':id}, { $set: params }, function(err, result) {
-      console.log('Equity by id ' + id + ' has been updated with ' + JSON.stringify(params));
+      logger.log('Equity by id ' + id + ' has been updated with ' + JSON.stringify(params));
       callback();
       close_connection();
     });
@@ -140,12 +143,12 @@ var createSnapshot = function(snapshot, callback) {
   getConnection(function(db, close_connection) {
     var collection = db.collection(snapshot_collection);
     collection.insert(snapshot, function(err, result) {
+      close_connection();
       
-      console.log(JSON.stringify(result.result));
-      console.log(JSON.stringify(result.ops));
+      logger.log(JSON.stringify(result.result));
+      logger.log(JSON.stringify(result.ops));
       delete snapshot._id;
       callback(snapshot);
-      close_connection();
     });
   });
 };
@@ -154,13 +157,13 @@ var createSnapshot = function(snapshot, callback) {
 var getSnapshotById = function(id, callback) {
   getConnection(function(db, close_connection) {
     var query = {'id': id};
-    console.log('Retrieving object by ' + JSON.stringify(query));
+    logger.log('Retrieving object by ' + JSON.stringify(query));
     
     var collection = db.collection(snapshot_collection);
     collection.find(query).toArray(function(err, docs) {
       var doc = docs.length > 0 ? docs[0] : null;
-      console.log("Retrieved the following records from the database");
-      console.log(doc == null ? 'None found' : doc);
+      logger.log("Retrieved the following records from the database");
+      logger.log(doc == null ? 'None found' : doc);
       if (doc != null) {
         delete doc._id;
       }
@@ -176,10 +179,10 @@ var getSnapshotsByEquity = function(id, limit, callback) {
     
     if (id.length > 15) {
       query = {'equityId': id};
-      console.log('Retrieving object by data store id ' + JSON.stringify(query));
+      logger.log('Retrieving object by data store id ' + JSON.stringify(query));
     } else {
       query = {'ticker': id};
-      console.log('Retrieving object by ticker ' + JSON.stringify(query));
+      logger.log('Retrieving object by ticker ' + JSON.stringify(query));
     }
     
     var options = {
@@ -202,7 +205,7 @@ var deleteSnapshotById = function(id, callback) {
   getConnection(function(db, close_connection) {
     var collection = db.collection(snapshot_collection);
     collection.deleteOne({'id':id}, function(err, result) {
-      console.log('Snapshot by id ' + id + ' has been deleted.');
+      logger.log('Snapshot by id ' + id + ' has been deleted.');
       callback();
       close_connection();
     });
@@ -217,8 +220,8 @@ var createAggregate = function(aggregate, callback) {
     var collection = db.collection(aggregate_collection);
     collection.insert(aggregate, function(err, result) {
       
-      console.log(JSON.stringify(result.result));
-      console.log(JSON.stringify(result.ops));
+      logger.log(JSON.stringify(result.result));
+      logger.log(JSON.stringify(result.ops));
       delete aggregate._id;
       callback(aggregate);
       close_connection();
@@ -232,10 +235,10 @@ var getAggregatesByEquity = function(id, limit, callback) {
     var query = {};
     if (id.length > 15) {
       query = {'equityId': id};
-      console.log('Retrieving object by data store id ' + JSON.stringify(query));
+      logger.log('Retrieving object by data store id ' + JSON.stringify(query));
     } else {
       query = {'ticker': id.toUpperCase()};
-      console.log('Retrieving object by ticker ' + JSON.stringify(query));
+      logger.log('Retrieving object by ticker ' + JSON.stringify(query));
     }
     
     var options = {
@@ -243,7 +246,7 @@ var getAggregatesByEquity = function(id, limit, callback) {
       'sort': [['date', 'desc']]
     };
     
-    console.log('Retrieving aggregates by ticker ' + id + ' the actual query is ' + JSON.stringify(query) + ' and the query options are ' + JSON.stringify(options));
+    logger.log('Retrieving aggregates by ticker ' + id + ' the actual query is ' + JSON.stringify(query) + ' and the query options are ' + JSON.stringify(options));
     
     var collection = db.collection(aggregate_collection);
     collection.find(query, options).toArray(function(err, docs) {
@@ -260,13 +263,13 @@ var getAggregatesByEquity = function(id, limit, callback) {
 var getAggregateById = function(id, callback) {
   getConnection(function(db, close_connection) {
     var query = {'id': id};
-    console.log('Retrieving object by ' + JSON.stringify(query));
+    logger.log('Retrieving object by ' + JSON.stringify(query));
     
     var collection = db.collection(aggregate_collection);
     collection.find(query).toArray(function(err, docs) {
       var doc = docs.length > 0 ? docs[0] : null;
-      console.log("Retrieved the following records from the database");
-      console.log(doc == null ? 'None found' : doc);
+      logger.log("Retrieved the following records from the database");
+      logger.log(doc == null ? 'None found' : doc);
       if (doc != null) {
         delete doc._id;
       }
@@ -280,7 +283,7 @@ var deleteAggregateById = function(id, callback) {
   getConnection(function(db, close_connection) {
     var collection = db.collection(aggregate_collection);
     collection.deleteOne({'id':id}, function(err, result) {
-      console.log('Aggregate by id ' + id + ' has been deleted.');
+      logger.log('Aggregate by id ' + id + ' has been deleted.');
       callback();
       close_connection();
     });

@@ -1,6 +1,8 @@
 import argparse
 import http.client
 import json
+import concurrent.futures
+
 
 class Equity():
     def __init__(self, ticker, name, exchange, industry, dow):
@@ -9,6 +11,19 @@ class Equity():
         self.exchange = exchange
         self.industry = industry
         self.dow = dow
+
+
+class Snapshot():
+    def __init__(self, ticker, created_date, date, price, price_change, price_change_percent, dividend, dividend_yield, pe):
+        self.ticker = ticker
+        self.created_date = created_date
+        self.date = date
+        self.price = price
+        self.price_change = price_change
+        self.price_change_percent = price_change_percent
+        self.dividend = dividend
+        self.dividend_yield = dividend_yield
+        self.pe = pe
 
 
 def get_existing_equities():
@@ -31,8 +46,37 @@ def get_existing_equities():
 
         equity = Equity(ticker, name, exchange, industry, dow_company)
         equities.append(equity)
+    f.close()
 
     return equities
+
+def get_existing_snapshots():
+    snapshots = []
+
+    f = open('snapshots.csv', 'r')
+    for row in f:
+        tokens = row.split(',')
+        ticker = tokens[0].strip('\n')
+        created_date = tokens[1].strip('\n')
+        date = tokens[2].strip('\n')
+        price = tokens[3].strip('\n')
+        price_change = tokens[4].strip('\n')
+        price_change_percent = tokens[5].strip('\n')
+        dividend = tokens[6].strip('\n')
+        if dividend == 'NULL':
+            dividend = None
+        dividend_yield = tokens[7].strip('\n')
+        if dividend_yield == 'NULL':
+            dividend_yield = None
+        pe = tokens[8].strip('\n')
+        if pe == 'NULL':
+            pe = None
+
+        snapshot = Snapshot(ticker, created_date, date, price, price_change, price_change_percent, dividend, dividend_yield, pe)
+        snapshots.append(snapshot)
+
+    f.close()
+    return snapshots
 
 
 def post_equity(equity):
@@ -65,6 +109,42 @@ def post_equity(equity):
 
     print('{} - created id = {}'.format(response_status_code, response_data.get('id')))
 
+def post_snapshot(snapshot):
+    conn = http.client.HTTPConnection('localhost', 5000)
+
+    request_body = {
+        'createdDate': snapshot.created_date,
+        'date': snapshot.date,
+        'price': snapshot.price,
+        'priceChange': snapshot.price_change,
+        'priceChangePercent': snapshot.price_change_percent
+    }
+
+    if snapshot.dividend is not None:
+        request_body['dividend'] = snapshot.dividend
+    if snapshot.dividend_yield is not None:
+        request_body['dividendYield'] = snapshot.dividend_yield
+    if snapshot.pe is not None:
+        request_body['pe'] = snapshot.pe
+
+    request_body_str = json.dumps(request_body)
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Content-Length': len(request_body_str)
+    }
+
+    conn.request('POST', '/v1/equities/{}/snapshots'.format(snapshot.ticker), request_body_str, headers)
+    #print('about to post to {} with {}'.format(snapshot.ticker, request_body_str))
+
+    raw_response = conn.getresponse()
+    # Return the status code as well as the content
+    response_status_code = raw_response.status
+    print('received {} when loading snapshot for ticker {}'.format(response_status_code, snapshot.ticker))
+    response_data = json.loads(raw_response.read().decode('utf-8'))
+    conn.close()
+
 def get_all_snapshots_for_equity(ticker):
     conn = http.client.HTTPConnection('localhost', 5000)
     headers = {
@@ -74,7 +154,7 @@ def get_all_snapshots_for_equity(ticker):
     conn.request('GET', '/v1/equities/{}/snapshots?limit=100000'.format(ticker), None, headers)
 
     raw_response = conn.getresponse()
-    print('received a {} from the server'.format(raw_response.status))
+    #print('received a {} when retrieving snapshots for {}'.format(raw_response.status, ticker))
 
     snapshots = json.loads(raw_response.read().decode('utf-8'))
     conn.close()
@@ -89,7 +169,7 @@ def get_all_aggregates_for_equity(ticker):
     conn.request('GET', '/v1/equities/{}/aggregates?limit=100000'.format(ticker), None, headers)
 
     raw_response = conn.getresponse()
-    print('received a {} from the server'.format(raw_response.status))
+    print('received a {} when retrieving aggregates for {}'.format(raw_response.status, ticker))
 
     aggregates = json.loads(raw_response.read().decode('utf-8'))
     conn.close()
@@ -104,13 +184,14 @@ def get_all_equities():
     conn.request('GET', '/v1/equities', None, headers)
 
     raw_response = conn.getresponse()
-    print('received a {} from the server'.format(raw_response.status))
+    #print('received a {} from the server'.format(raw_response.status))
 
     equities = json.loads(raw_response.read().decode('utf-8'))
     conn.close()
     return equities
 
-def delete_equity(equity):
+
+def delete_equity(equity, num):
     conn = http.client.HTTPConnection('localhost', 5000)
     headers = {
         'Content-Type': 'application/json',
@@ -120,7 +201,8 @@ def delete_equity(equity):
 
     raw_response = conn.getresponse()
     conn.close()
-    print('deleted {} - {} from the database'.format(equity.get('ticker'), equity.get('id')))
+    print('{}) deleted {} - {} from the database'.format(num, equity.get('ticker'), equity.get('id')))
+
 
 def delete_snapshot(snapshot):
     conn = http.client.HTTPConnection('localhost', 5000)
@@ -132,7 +214,8 @@ def delete_snapshot(snapshot):
 
     raw_response = conn.getresponse()
     conn.close()
-    print('received a {} response from the database deleting {} - aggregate {}'.format(raw_response.status, snapshot.get('ticker'), snapshot.get('id')))
+    #print('received a {} response from the database deleting {} - snapshot {}'.format(raw_response.status, snapshot.get('ticker'), snapshot.get('id')))
+
 
 def delete_aggregate(aggregate):
     conn = http.client.HTTPConnection('localhost', 5000)
@@ -145,38 +228,63 @@ def delete_aggregate(aggregate):
 
     raw_response = conn.getresponse()
     conn.close()
-    print('received a {} response from the database deleting {} - snapshot {}'.format(raw_response.status,
+    print('received a {} response from the database deleting {} - aggregate {}'.format(raw_response.status,
                                                                                       aggregate.get('ticker'),
                                                                                       aggregate.get('id')))
 
+
 def delete_equities_from_database():
     equities = get_all_equities()
+    the_count = 1
     for equity in equities:
-        delete_equity(equity)
+        delete_equity(equity, the_count)
+        the_count += 1
         #print('Equity {} has an id of {}'.format(equity.get('ticker'), equity.get('id')))
+
 
 def load_equities():
     equities = get_existing_equities()
     for equity in equities:
         post_equity(equity)
+    snapshots = get_existing_snapshots()
+
+    # Multi-thread the event across 20 threads
+    executor = concurrent.futures.ProcessPoolExecutor(30)
+    futures = [executor.submit(post_snapshot, snapshot) for snapshot in snapshots]
+    concurrent.futures.wait(futures)
+
+    #for snapshot in snapshots:
+    #    post_snapshot(snapshot)
+
 
 def delete_snapshots_for_equity(ticker):
     snapshots = get_all_snapshots_for_equity(ticker)
-    for snapshot in snapshots:
-        delete_snapshot(snapshot)
+    print('About to delete {} snapshots from {}'.format(len(snapshots), ticker))
+
+    # Multi-thread the event across 20 threads
+    executor = concurrent.futures.ProcessPoolExecutor(15)
+    futures = [executor.submit(delete_snapshot, snapshot) for snapshot in snapshots]
+    concurrent.futures.wait(futures)
+
+    #for snapshot in snapshots:
+    #    delete_snapshot(snapshot)
+
 
 def delete_aggregates_for_equity(ticker):
     aggregates = get_all_aggregates_for_equity(ticker)
     for aggregate in aggregates:
         delete_aggregate(aggregate)
 
+
 def delete_everything():
     equities = get_all_equities()
+    the_count = 1
     for equity in equities:
         ticker = equity.get('ticker')
         delete_snapshots_for_equity(ticker)
         delete_aggregates_for_equity(ticker)
-        delete_equity(equity)
+        delete_equity(equity, the_count)
+        the_count += 1
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Gathering arguments')

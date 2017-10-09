@@ -1,6 +1,7 @@
 var express = require('express');
 var equityRouter = express.Router();
 var dal = require('../dal.js');
+var logger = require('../logger.js');
 
 // Set the content type here since it'll always be JS - also just trying to keep code around for having a specific use on a router :)
 equityRouter.use(function(req, res, next) {
@@ -10,9 +11,11 @@ equityRouter.use(function(req, res, next) {
 
 // Route for retrieving a bunch of equities with a filter applied.  Currently filter is required and only works for 'dow'
 equityRouter.get('/', function(req, res) {
+  timer = logger.logTiming();
   var filter = req.query.filter;
   if (!filter) {
     dal.getAllEquities(function(docs) {
+      logger.logTiming('GET all equity', timer);
       res.status(200).send(JSON.stringify(docs));
     });
   } else {
@@ -21,6 +24,7 @@ equityRouter.get('/', function(req, res) {
       res.status(400).send(JSON.stringify({error:'The only options available for the filter parameter are: dow'}));
     } else {
       dal.getEquitiesByFilter('dow', true, function(docs) {
+        logger.logTiming('Completing get of all equities');
         res.status(200).send(JSON.stringify(docs));
       });
     }
@@ -29,10 +33,12 @@ equityRouter.get('/', function(req, res) {
                  
 // Route for retrieving an equity by Id
 equityRouter.get('/:id', function(req, res) {
+  timer = logger.logTiming();
   dal.getEquityById(req.params.id, function(doc){
     
     if (doc != null) {
-      res.status(200).send(JSON.stringify(doc));  
+      res.status(200).send(JSON.stringify(doc));
+      logger.logTiming('GET equity ' + req.params.id, timer);
     } else {
       var errorMessage = {
         error: 'No equity found with id ' + req.params.id
@@ -46,7 +52,7 @@ equityRouter.get('/:id', function(req, res) {
 // Route for creating an equity
 equityRouter.post('/', function(req, res) {
   var reqBody = req.body;
-  console.log('Post called with ' + JSON.stringify(reqBody));
+  logger.log('Post called with ' + JSON.stringify(reqBody));
   
   if (!reqBody.id) {
     dal.createEquity(reqBody, function(equity) {
@@ -62,7 +68,7 @@ equityRouter.put('/:id', function(req, res) {
   var reqBody = req.body;
   var equityId = req.params.id;
   reqBody.id = equityId;
-  console.log('Put called with ' + JSON.stringify(reqBody));
+  logger.log('Put called with ' + JSON.stringify(reqBody));
   
   dal.createEquity(reqBody, function(equity) {
     res.end(JSON.stringify(equity));
@@ -73,7 +79,7 @@ equityRouter.put('/:id', function(req, res) {
 equityRouter.patch('/:id', function(req, res) {
   var reqBody = req.body;
   var id = req.params.id;
-  console.log('Patch called for document ' + id + ' and payload ' + JSON.stringify(reqBody));
+  logger.log('Patch called for document ' + id + ' and payload ' + JSON.stringify(reqBody));
   
   if (id == null) {
     responseMessage = { "error": "An id must be passed in to identify the individual resource."};
@@ -115,13 +121,13 @@ equityRouter.delete('/:id', function(req, res) {
 
 equityRouter.get('/:id/snapshots', function(req, res) {
   var id = req.params.id;
-  console.log('id = ' + id);
+  logger.log('id = ' + id);
   if (!id) {
     res.status(400).send(JSON.stringify({error:"'id' is a required path parameter. (example: /v1/equities/AAPL/snapshots)"}));
   } else {
     // Make sure numResults is a valid number
     var numResults = req.query.limit;
-    console.log('numResults = ' + numResults);
+    logger.log('numResults = ' + numResults);
     if (typeof numResults === 'undefined') {
       numResults = 1;
     } else {
@@ -129,7 +135,7 @@ equityRouter.get('/:id/snapshots', function(req, res) {
     }
     
     dal.getSnapshotsByEquity(id, numResults, function(docs) {
-      console.log(docs)
+      logger.log(docs)
       res.status(200).send(JSON.stringify(docs));
     });
   } 
@@ -138,7 +144,7 @@ equityRouter.get('/:id/snapshots', function(req, res) {
 // Route for creating an equity snapshot
 equityRouter.post('/:id/snapshots', function(req, res) {
   var reqBody = req.body;
-  console.log('Post called with ' + JSON.stringify(reqBody));
+  logger.log('Post called with ' + JSON.stringify(reqBody));
   
   id = req.params.id;
   if (id.length > 15) {
@@ -151,7 +157,7 @@ equityRouter.post('/:id/snapshots', function(req, res) {
   
   if (!reqBody.id) {
     dal.createSnapshot(reqBody, function(snapshot) {
-      res.end(JSON.stringify(snapshot));
+      res.status(201).send(JSON.stringify(snapshot));
     });
   } else {
     res.status(400).send('{ "error": "Update not supported yet" }');
@@ -176,6 +182,7 @@ equityRouter.get('/:equityId/snapshots/:id', function(req, res) {
 
 // Deletes a particular record by id
 equityRouter.delete('/:equityId/snapshots/:id', function(req, res) {
+  timer = logger.logTiming();
   var responseCode = null;
   var id = req.params.id;
   
@@ -189,6 +196,7 @@ equityRouter.delete('/:equityId/snapshots/:id', function(req, res) {
         res.status(404).send(JSON.stringify({ "error": "No resource found."}));
       } else {
         dal.deleteSnapshotById(id, function() {
+          logger.logTiming('Deleting snapshot ' + id, timer);
           res.sendStatus(204);
         });
       }
@@ -204,7 +212,7 @@ equityRouter.get('/:id/aggregates', function(req, res) {
   } else {
     
     var numResults = req.query.limit;
-    console.log('numResults = ' + numResults);
+    logger.log('numResults = ' + numResults);
     if (typeof numResults === 'undefined') {
       numResults = 1;
     } else {
@@ -246,7 +254,7 @@ equityRouter.post('/:id/aggregates', function(req, res) {
     reqBody.ticker = id.toUpperCase();
   }
   
-  console.log('Post called with ' + JSON.stringify(reqBody));
+  logger.log('Post called with ' + JSON.stringify(reqBody));
   
   if (!reqBody.id) {
     dal.createAggregate(reqBody, function(aggregate) {
@@ -262,7 +270,7 @@ equityRouter.delete('/:equityId/aggregates/:id', function(req, res) {
   equityId = req.params.equityId
   id = req.params.id;
   
-  console.log('Delete called for equity ' + equityId + ' and aggregate ' + id);
+  logger.log('Delete called for equity ' + equityId + ' and aggregate ' + id);
   
   if (id == null) {
     responseMessage = { "error": "An id must be passed in to identify the individual resource."};
