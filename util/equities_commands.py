@@ -26,6 +26,18 @@ class Snapshot():
         self.pe = pe
 
 
+class Aggregate():
+    def __init__(self, ticker, created_date, date, fifty_day_moving_avg, fifty_day_volatility_avg,
+                 per_off_recent_high, per_off_recent_low):
+        self.ticker = ticker
+        self.created_date = created_date
+        self.date = date
+        self.fifty_day_moving_avg = fifty_day_moving_avg
+        self.fifty_day_volatility_avg = fifty_day_volatility_avg
+        self.per_off_recent_high = per_off_recent_high
+        self.per_off_recent_low = per_off_recent_low
+
+
 def get_existing_equities():
     equities = []
 
@@ -77,6 +89,27 @@ def get_existing_snapshots():
 
     f.close()
     return snapshots
+
+def get_existing_aggregates():
+    aggregates = []
+
+    f = open('all_aggregates.csv', 'r')
+    for row in f:
+        tokens = row.split(',')
+        ticker = tokens[0].strip('\n')
+        created_date = tokens[1].strip('\n')
+        date = tokens[2].strip('\n')
+        fifty_day_moving_avg = tokens[3].strip('\n')
+        fifty_day_volatility_avg = tokens[4].strip('\n')
+        per_off_recent_high = tokens[5].strip('\n')
+        per_off_recent_low = tokens[6].strip('\n')
+
+        aggregate = Aggregate(ticker, created_date, date, fifty_day_moving_avg, fifty_day_volatility_avg,
+                              per_off_recent_high, per_off_recent_low)
+        aggregates.append(aggregate)
+
+    f.close()
+    return aggregates
 
 
 def post_equity(equity):
@@ -142,6 +175,36 @@ def post_snapshot(snapshot):
     # Return the status code as well as the content
     response_status_code = raw_response.status
     print('received {} when loading snapshot for ticker {}'.format(response_status_code, snapshot.ticker))
+    response_data = json.loads(raw_response.read().decode('utf-8'))
+    conn.close()
+
+def post_aggregate(aggregate):
+    conn = http.client.HTTPConnection('localhost', 5000)
+
+    request_body = {
+        'createdDate': aggregate.created_date,
+        'date': aggregate.date,
+        'fiftyDayMovingAverage': aggregate.fifty_day_moving_avg,
+        'fiftyDayVolatilityAverage': aggregate.fifty_day_volatility_avg,
+        'perOffRecentHigh': aggregate.per_off_recent_high,
+        'perOffRecentLow': aggregate.per_off_recent_low
+    }
+
+    request_body_str = json.dumps(request_body)
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Content-Length': len(request_body_str)
+    }
+
+    conn.request('POST', '/v1/equities/{}/aggregates'.format(aggregate.ticker), request_body_str, headers)
+    # print('about to post to {} with {}'.format(snapshot.ticker, request_body_str))
+
+    raw_response = conn.getresponse()
+    # Return the status code as well as the content
+    response_status_code = raw_response.status
+    print('received {} when loading aggregate for ticker {}'.format(response_status_code, aggregate.ticker))
     response_data = json.loads(raw_response.read().decode('utf-8'))
     conn.close()
 
@@ -243,18 +306,22 @@ def delete_equities_from_database():
 
 
 def load_equities():
-    equities = get_existing_equities()
-    for equity in equities:
-        post_equity(equity)
-    snapshots = get_existing_snapshots()
+    #equities = get_existing_equities()
+    #for equity in equities:
+    #    post_equity(equity)
+    #snapshots = get_existing_snapshots()
 
     # Multi-thread the event across 20 threads
-    executor = concurrent.futures.ProcessPoolExecutor(30)
-    futures = [executor.submit(post_snapshot, snapshot) for snapshot in snapshots]
-    concurrent.futures.wait(futures)
+    #executor = concurrent.futures.ProcessPoolExecutor(30)
+    #futures = [executor.submit(post_snapshot, snapshot) for snapshot in snapshots]
+    #concurrent.futures.wait(futures)
 
-    #for snapshot in snapshots:
-    #    post_snapshot(snapshot)
+    snapshots = None
+
+    # Get existing aggregates and load them
+    aggregates = get_existing_aggregates()
+    for aggregate in aggregates:
+        post_aggregate(aggregate)
 
 
 def delete_snapshots_for_equity(ticker):

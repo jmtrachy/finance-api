@@ -258,7 +258,7 @@ equityRouter.post('/:id/aggregates', function(req, res) {
   
   if (!reqBody.id) {
     dal.createAggregate(reqBody, function(aggregate) {
-      res.end(JSON.stringify(aggregate));
+      res.status(201).send(JSON.stringify(aggregate));
     });
   } else {
     res.status(400).send('{ "error": "Update not supported yet" }');

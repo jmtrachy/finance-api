@@ -21,7 +21,7 @@ if (environmentName == 'prod') {
   env = local;
 }
 
-var logVerbose = false;
+var logVerbose = true;
 var logTimings = true;
 
 module.exports = {
