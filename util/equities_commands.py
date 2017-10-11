@@ -305,23 +305,38 @@ def delete_equities_from_database():
         #print('Equity {} has an id of {}'.format(equity.get('ticker'), equity.get('id')))
 
 
+def load_all_data():
+    load_equities()
+    load_snapshots()
+    load_aggregates()
+
+
 def load_equities():
-    #equities = get_existing_equities()
-    #for equity in equities:
-    #    post_equity(equity)
-    #snapshots = get_existing_snapshots()
+    equities = get_existing_equities()
+    for equity in equities:
+        post_equity(equity)
+
+
+def load_snapshots():
+    snapshots = get_existing_snapshots()
 
     # Multi-thread the event across 20 threads
-    #executor = concurrent.futures.ProcessPoolExecutor(30)
-    #futures = [executor.submit(post_snapshot, snapshot) for snapshot in snapshots]
-    #concurrent.futures.wait(futures)
+    executor = concurrent.futures.ProcessPoolExecutor(30)
+    futures = [executor.submit(post_snapshot, snapshot) for snapshot in snapshots]
+    concurrent.futures.wait(futures)
 
+    # Free up some memory
     snapshots = None
 
+
+def load_aggregates():
     # Get existing aggregates and load them
     aggregates = get_existing_aggregates()
     for aggregate in aggregates:
         post_aggregate(aggregate)
+
+    # Free up some memory
+    aggregates = None
 
 
 def delete_snapshots_for_equity(ticker):
