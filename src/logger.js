@@ -12,7 +12,7 @@ var logTiming = function(event, startTimer) {
     logTimer = currentTime = new Date().getTime();
     if (startTimer != null) {
       totalMillis = logTimer - startTimer
-      console.log(event + ' took ' + totalMillis);
+      console.log(event + ' took ' + totalMillis + ' millis');
     }
   }
   return logTimer;

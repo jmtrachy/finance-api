@@ -26,7 +26,7 @@ equityRouter.get('/', function(req, res) {
       res.status(400).send(JSON.stringify({error:'The only options available for the filter parameter are: dow'}));
     } else {
       dal.getEquitiesByFilter('dow', true, function(docs) {
-        logger.logTiming('Completing get of all dow equities');
+        logger.logTiming('Completing get of all dow equities', timer);
         res.status(200).send(JSON.stringify(docs));
       });
     }
@@ -125,6 +125,7 @@ equityRouter.delete('/:id', function(req, res) {
 
 equityRouter.get('/:id/snapshots', function(req, res) {
   var id = req.params.id;
+  timer = logger.logTiming();
   logger.log('id = ' + id);
   if (!id) {
     res.status(400).send(JSON.stringify({error:"'id' is a required path parameter. (example: /v1/equities/AAPL/snapshots)"}));
@@ -140,6 +141,7 @@ equityRouter.get('/:id/snapshots', function(req, res) {
     
     dal.getSnapshotsByEquity(id, numResults, function(docs) {
       logger.log(docs)
+      logger.logTiming('Completing get of ' + numResults + ' snapshots for equity ' + id, timer);
       res.status(200).send(JSON.stringify(docs));
     });
   } 
@@ -212,6 +214,7 @@ equityRouter.delete('/:equityId/snapshots/:id', function(req, res) {
 
 // Retrieves aggregates based on a ticker symbol
 equityRouter.get('/:id/aggregates', function(req, res) {
+  timer = logger.logTiming();
   var id = req.params.id;
   if (!id) {
     res.status(400).send(JSON.stringify({error:"'id' is a required path parameter. It can either be a ticker symbol or an equity id"}));
@@ -226,6 +229,7 @@ equityRouter.get('/:id/aggregates', function(req, res) {
     }
     
     dal.getAggregatesByEquity(id, numResults, function(docs) {
+      logger.logTiming('Completing get of ' + numResults + ' aggregates for equity ' + id, timer);
       res.status(200).send(JSON.stringify(docs));
     });
   } 
@@ -239,7 +243,7 @@ equityRouter.get('/:equityId/aggregates/:id', function(req, res) {
       res.status(200).send(JSON.stringify(doc));  
     } else {
       var errorMessage = {
-        error: 'No snapshot found with id ' + req.params.id
+        error: 'No aggregate found with id ' + req.params.id
       }
       res.status(404).send(errorMessage);
     }
