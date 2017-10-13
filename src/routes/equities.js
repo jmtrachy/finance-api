@@ -9,6 +9,8 @@ equityRouter.use(function(req, res, next) {
   next();
 });
 
+// ********************************************* Equities ***************************************************
+
 // Route for retrieving a bunch of equities with a filter applied.  Currently filter is required and only works for 'dow'
 equityRouter.get('/', function(req, res) {
   timer = logger.logTiming();
@@ -119,6 +121,8 @@ equityRouter.delete('/:id', function(req, res) {
   }
 });
 
+//******************************************** Snapshots ************************************************
+
 equityRouter.get('/:id/snapshots', function(req, res) {
   var id = req.params.id;
   logger.log('id = ' + id);
@@ -162,7 +166,7 @@ equityRouter.post('/:id/snapshots', function(req, res) {
   } else {
     res.status(400).send('{ "error": "Update not supported yet" }');
   }  
-});
+}); 
 
 // Route for retrieving a snapshot by Id
 equityRouter.get('/:equityId/snapshots/:id', function(req, res) {
@@ -203,6 +207,8 @@ equityRouter.delete('/:equityId/snapshots/:id', function(req, res) {
     });
   }
 });
+
+//******************************************** Aggregates ************************************************
 
 // Retrieves aggregates based on a ticker symbol
 equityRouter.get('/:id/aggregates', function(req, res) {
