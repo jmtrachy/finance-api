@@ -24,7 +24,7 @@ equityRouter.get('/', function(req, res) {
       res.status(400).send(JSON.stringify({error:'The only options available for the filter parameter are: dow'}));
     } else {
       dal.getEquitiesByFilter('dow', true, function(docs) {
-        logger.logTiming('Completing get of all equities');
+        logger.logTiming('Completing get of all dow equities');
         res.status(200).send(JSON.stringify(docs));
       });
     }
@@ -56,7 +56,7 @@ equityRouter.post('/', function(req, res) {
   
   if (!reqBody.id) {
     dal.createEquity(reqBody, function(equity) {
-      res.end(JSON.stringify(equity));
+      res.status(201).send(JSON.stringify(equity));
     });
   } else {
     res.status(400).send('{ "error": "Update not supported yet" }');
