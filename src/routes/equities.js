@@ -77,8 +77,7 @@ equityRouter.put('/:id', function(req, res) {
   });
 });
 
-// Route for updating parts of an equity
-equityRouter.patch('/:id', function(req, res) {
+const patchEquity = async (req, res) => {
   var reqBody = req.body;
   var id = req.params.id;
   logger.log('Patch called for document ' + id + ' and payload ' + JSON.stringify(reqBody));
@@ -87,6 +86,32 @@ equityRouter.patch('/:id', function(req, res) {
     responseMessage = { "error": "An id must be passed in to identify the individual resource."};
     res.status(400).send(JSON.stringify(responseMessage));
   } else {
+    
+    dal.getEquityById(id, function(doc) {
+      if (doc == null) {
+        res.status(404).send(JSON.stringify({ "error": "No resource found."}));
+      } else {
+        dal.updateEquity(id, reqBody, function() {
+          res.sendStatus(204);
+        });
+      }
+    });
+  }
+}
+
+equityRouter.patch('/:id', patchEquity);
+
+// Route for updating parts of an equity
+equityRouter.patch('/asdf/:id', function(req, res) {
+  var reqBody = req.body;
+  var id = req.params.id;
+  logger.log('Patch called for document ' + id + ' and payload ' + JSON.stringify(reqBody));
+  
+  if (id == null) {
+    responseMessage = { "error": "An id must be passed in to identify the individual resource."};
+    res.status(400).send(JSON.stringify(responseMessage));
+  } else {
+    
     dal.getEquityById(id, function(doc) {
       if (doc == null) {
         res.status(404).send(JSON.stringify({ "error": "No resource found."}));
