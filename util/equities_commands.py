@@ -321,7 +321,7 @@ def load_snapshots():
     snapshots = get_existing_snapshots()
 
     # Multi-thread the event across 20 threads
-    executor = concurrent.futures.ProcessPoolExecutor(30)
+    executor = concurrent.futures.ProcessPoolExecutor(2)
     futures = [executor.submit(post_snapshot, snapshot) for snapshot in snapshots]
     concurrent.futures.wait(futures)
 
@@ -344,7 +344,7 @@ def delete_snapshots_for_equity(ticker):
     print('About to delete {} snapshots from {}'.format(len(snapshots), ticker))
 
     # Multi-thread the event across 20 threads
-    executor = concurrent.futures.ProcessPoolExecutor(15)
+    executor = concurrent.futures.ProcessPoolExecutor(2)
     futures = [executor.submit(delete_snapshot, snapshot) for snapshot in snapshots]
     concurrent.futures.wait(futures)
 
@@ -376,7 +376,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.load == 'true':
-        load_equities()
+        load_all_data()
     elif args.delete == 'true':
         user_input = input('This will delete ALL equities from the database. Are you sure you\'d like to continue? (Y/N) [N]: ')
         if user_input == 'Y':

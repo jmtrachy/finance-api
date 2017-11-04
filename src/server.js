@@ -30,8 +30,9 @@ app.use('/v1/equities', equityRouter);
 //app.use('/v1/aggregates', aggregateRouter);
 app.use('/v1/health', healthRouter);
 
-app.listen(port, function() {
-  startupMessage = 'Server started, up and listening on port ' + port;
-  console.log(startupMessage);
-  //options = { description: startupMessage, correlation_id: "Server Startup"};
-})
+dal.initializeDatabases(function() {
+  app.listen(port, function() {
+    startupMessage = 'Server started, up and listening on port ' + port;
+    console.log(startupMessage);
+  })
+});

@@ -24,10 +24,11 @@ equityRouter.get('/', function(req, res) {
     filter = filter.toLowerCase();
     if (filter != 'dow') {
       res.status(400).send(JSON.stringify({error:'The only options available for the filter parameter are: dow'}));
+      logger.logTiming('Completing get of all dow equities (400)', timer);
     } else {
       dal.getEquitiesByFilter('dow', true, function(docs) {
-        logger.logTiming('Completing get of all dow equities', timer);
         res.status(200).send(JSON.stringify(docs));
+        logger.logTiming('Completing get of all dow equities', timer);
       });
     }
   } 
@@ -46,6 +47,7 @@ equityRouter.get('/:id', function(req, res) {
         error: 'No equity found with id ' + req.params.id
       }
       res.status(404).send(errorMessage);
+      logger.logTiming('GET equity (404)' + req.params.id, timer);
     }
     
   });
@@ -53,15 +55,18 @@ equityRouter.get('/:id', function(req, res) {
 
 // Route for creating an equity
 equityRouter.post('/', function(req, res) {
+  timer = logger.logTiming();
   var reqBody = req.body;
   logger.log('Post called with ' + JSON.stringify(reqBody));
   
   if (!reqBody.id) {
     dal.createEquity(reqBody, function(equity) {
       res.status(201).send(JSON.stringify(equity));
+      logger.logTiming('POST equity ' + req.params.id, timer);
     });
   } else {
     res.status(400).send('{ "error": "Update not supported yet" }');
+    logger.logTiming('POST equity ' + req.params.id, timer);
   }  
 });
 
@@ -126,6 +131,7 @@ equityRouter.patch('/asdf/:id', function(req, res) {
 
 // Deletes a particular record by id
 equityRouter.delete('/:id', function(req, res) {
+  timer = logger.logTiming();
   var responseCode = null;
   var id = req.params.id;
   
@@ -137,9 +143,11 @@ equityRouter.delete('/:id', function(req, res) {
     dal.getEquityById(id, function(doc) {
       if (doc == null) {
         res.status(404).send(JSON.stringify({ "error": "No resource found."}));
+        logger.logTiming('GET equity (404)' + req.params.id, timer);
       } else {
         dal.deleteEquity(id, function() {
           res.sendStatus(204);
+          logger.logTiming('GET equity (204)' + req.params.id, timer);
         });
       }
     });
@@ -174,6 +182,8 @@ equityRouter.get('/:id/snapshots', function(req, res) {
 
 // Route for creating an equity snapshot
 equityRouter.post('/:id/snapshots', function(req, res) {
+  timer = logger.logTiming();
+  
   var reqBody = req.body;
   logger.log('Post called with ' + JSON.stringify(reqBody));
   
@@ -188,6 +198,7 @@ equityRouter.post('/:id/snapshots', function(req, res) {
   
   if (!reqBody.id) {
     dal.createSnapshot(reqBody, function(snapshot) {
+      logger.logTiming('POST snapshot for equity ' + req.params.id, timer);
       res.status(201).send(JSON.stringify(snapshot));
     });
   } else {
@@ -197,8 +208,9 @@ equityRouter.post('/:id/snapshots', function(req, res) {
 
 // Route for retrieving a snapshot by Id
 equityRouter.get('/:equityId/snapshots/:id', function(req, res) {
+  timer = logger.logTiming();
   dal.getSnapshotById(req.params.id, function(doc){
-    
+    logger.logTiming('GET snapshot ' + req.params.id + ' for equity ' + req.params.equityId, timer);
     if (doc != null) {
       res.status(200).send(JSON.stringify(doc));  
     } else {
@@ -262,10 +274,12 @@ equityRouter.get('/:id/aggregates', function(req, res) {
 
 // Route for retrieving an aggregate by Id
 equityRouter.get('/:equityId/aggregates/:id', function(req, res) {
+  timer = logger.logTiming();
   dal.getAggregateById(req.params.id, function(doc){
     
     if (doc != null) {
-      res.status(200).send(JSON.stringify(doc));  
+      res.status(200).send(JSON.stringify(doc));
+      logger.logTiming('GET aggregate of id ' + req.params.id, timer);
     } else {
       var errorMessage = {
         error: 'No aggregate found with id ' + req.params.id
@@ -278,6 +292,7 @@ equityRouter.get('/:equityId/aggregates/:id', function(req, res) {
 
 // Route for creating an aggregate
 equityRouter.post('/:id/aggregates', function(req, res) {
+  timer = logger.logTiming();
   var reqBody = req.body;  
   id = req.params.id;
   
@@ -294,6 +309,7 @@ equityRouter.post('/:id/aggregates', function(req, res) {
   if (!reqBody.id) {
     dal.createAggregate(reqBody, function(aggregate) {
       res.status(201).send(JSON.stringify(aggregate));
+      logger.logTiming('POST aggregate of id ' + req.params.id, timer);
     });
   } else {
     res.status(400).send('{ "error": "Update not supported yet" }');
@@ -302,6 +318,7 @@ equityRouter.post('/:id/aggregates', function(req, res) {
 
 // Delete an aggregate
 equityRouter.delete('/:equityId/aggregates/:id', function(req, res) {
+  timer = logger.logTiming();
   equityId = req.params.equityId
   id = req.params.id;
   
@@ -314,9 +331,11 @@ equityRouter.delete('/:equityId/aggregates/:id', function(req, res) {
     dal.getAggregateById(id, function(doc) {
       if (doc == null) {
         res.status(404).send(JSON.stringify({ "error": "No resource found."}));
+        logger.logTiming('DELETE aggregate of id (404)' + req.params.id, timer);
       } else {
         dal.deleteAggregateById(id, function() {
           res.sendStatus(204);
+          logger.logTiming('DELETE aggregate of id ' + req.params.id, timer);
         });
       }
     });
