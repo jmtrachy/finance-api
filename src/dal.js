@@ -35,44 +35,41 @@ var initializeDatabases = function(callback) {
 
 // ********************************************* EQUITIES ********************************************* \\
 
-var createEquity = function(equity, callback) {
+const createEquity = async (equity) => {
   if (equity.id === undefined) {
     equity.id = randomString(optionsForId);
   }
   logger.log('Creating equity');
 
-  mdb.collection(equity_collection).insert(equity, function(err, result) {
-    logger.log(JSON.stringify(result.result));
-    logger.log(JSON.stringify(result.ops));
-    delete equity._id;
-    callback(equity);
-  });
+  let doc = mdb.collection(equity_collection).insert(equity);
+  delete equity._id;
+  
+  return doc;
 };
 
-var getAllEquities = function(callback) {
-  var query = {}
+const getAllEquities = async () => {
+  var query = {};
   logger.log('Retrieving all equities');
 
-  mdb.collection(equity_collection).find(query).toArray(function(err, docs) {
-    for (doc in docs) {
-      delete docs[doc]._id;
-    }
-    callback(docs);
-  });
+  docs = mdb.collection(equity_collection).find(query).toArray();
+  for (doc in docs) {
+    delete docs[doc]._id;
+  }
+  return docs;
 };
 
 // Should this really be allowed?  Seems very exploitable if not controlled properly
-var getEquitiesByFilter = function(queryField, queryValue, callback) {
+const getEquitiesByFilter = async (queryField, queryValue) => {
   var query = {};
   query[queryField] = queryValue;
   logger.log('Retrieving object by ' + JSON.stringify(query));
 
-  mdb.collection(equity_collection).find(query).toArray(function(err, docs) {
-    for (doc in docs) {
-      delete docs[doc]._id;
-    }
-    callback(docs);
-  });
+  docs = await mdb.collection(equity_collection).find(query).toArray();
+  for (doc in docs) {
+    delete docs[doc]._id;
+  }
+  
+  return docs;
 };
 
 const getEquityById = async(id) => {
@@ -100,12 +97,10 @@ const getEquityById = async(id) => {
   return doc;
 };
 
-var deleteEquity = function(id, callback) {
-    mdb.collection(equity_collection).deleteOne({'id':id}, function(err, result) {
-      logger.log('Equity by id ' + id + ' has been deleted.');
-      callback();
-    });
-};
+const deleteEquity = async (id) => {
+  mdb.collection(equity_collection).deleteOne({'id':id});
+  logger.log('Equity by id ' + id + ' has been deleted.');
+}
 
 var updateEquity = function(id, params, callback) {
   mdb.collection(equity_collection).updateOne({'id':id}, { $set: params }, function(err, result) {

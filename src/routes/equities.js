@@ -12,24 +12,22 @@ equityRouter.use(function(req, res, next) {
 // ********************************************* Equities ***************************************************
 
 // Route for retrieving a bunch of equities with a filter applied.  Currently filter is required and only works for 'dow'
-equityRouter.get('/', function(req, res) {
+equityRouter.get('/', async (req, res) => {
   timer = logger.logTiming();
-  var filter = req.query.filter;
+  let filter = req.query.filter;
   if (!filter) {
-    dal.getAllEquities(function(docs) {
-      logger.logTiming('GET all equity', timer);
-      res.status(200).send(JSON.stringify(docs));
-    });
+    let docs = await dal.getAllEquities();
+    logger.logTiming('GET all equity', timer);
+    res.status(200).send(JSON.stringify(docs));
   } else {
     filter = filter.toLowerCase();
     if (filter != 'dow') {
       res.status(400).send(JSON.stringify({error:'The only options available for the filter parameter are: dow'}));
       logger.logTiming('Completing get of all dow equities (400)', timer);
     } else {
-      dal.getEquitiesByFilter('dow', true, function(docs) {
-        res.status(200).send(JSON.stringify(docs));
-        logger.logTiming('Completing get of all dow equities', timer);
-      });
+      let docs = await dal.getEquitiesByFilter('dow', true);
+      res.status(200).send(JSON.stringify(docs));
+      logger.logTiming('Completing get of all dow equities', timer);
     }
   } 
 });
@@ -45,7 +43,7 @@ equityRouter.get('/:id', async (req, res) => {
     res.status(200).send(JSON.stringify(doc));
     logger.logTiming('GET equity ' + req.params.id, timer);
   } else {
-    var errorMessage = {
+    let errorMessage = {
       error: 'No equity found with id ' + req.params.id
     }
     res.status(404).send(errorMessage);
@@ -54,16 +52,15 @@ equityRouter.get('/:id', async (req, res) => {
 });
 
 // Route for creating an equity
-equityRouter.post('/', function(req, res) {
+equityRouter.post('/', async (req, res) => {
   timer = logger.logTiming();
-  var reqBody = req.body;
+  let reqBody = req.body;
   logger.log('Post called with ' + JSON.stringify(reqBody));
   
   if (!reqBody.id) {
-    dal.createEquity(reqBody, function(equity) {
-      res.status(201).send(JSON.stringify(equity));
-      logger.logTiming('POST equity ' + req.params.id, timer);
-    });
+    let equity = await dal.createEquity(reqBody);
+    res.status(201).send(JSON.stringify(equity));
+    logger.logTiming('POST equity ' + req.params.id, timer);
   } else {
     res.status(400).send('{ "error": "Update not supported yet" }');
     logger.logTiming('POST equity ' + req.params.id, timer);
@@ -71,15 +68,14 @@ equityRouter.post('/', function(req, res) {
 });
 
 // Route for creating an equity by id
-equityRouter.put('/:id', function(req, res) {
-  var reqBody = req.body;
-  var equityId = req.params.id;
+equityRouter.put('/:id', async (req, res) => {
+  let reqBody = req.body;
+  let equityId = req.params.id;
   reqBody.id = equityId;
   logger.log('Put called with ' + JSON.stringify(reqBody));
   
-  dal.createEquity(reqBody, function(equity) {
-    res.end(JSON.stringify(equity));
-  });
+  let equity = dal.createEquity(reqBody);
+  res.status(201).send(JSON.stringify(equity));
 });
 
 equityRouter.patch('/:id', async (req, res) => {
@@ -105,7 +101,7 @@ equityRouter.patch('/:id', async (req, res) => {
 });
 
 // Deletes a particular record by id
-equityRouter.delete('/:id', function(req, res) {
+equityRouter.delete('/:id', async (req, res) => {
   timer = logger.logTiming();
   var responseCode = null;
   var id = req.params.id;
@@ -115,17 +111,15 @@ equityRouter.delete('/:id', function(req, res) {
     responseMessage = { "error": "An id must be passed in to identify the individual resource."};
     res.status(400).send(JSON.stringify(responseMessage));
   } else {
-    dal.getEquityById(id, function(doc) {
-      if (doc == null) {
-        res.status(404).send(JSON.stringify({ "error": "No resource found."}));
-        logger.logTiming('GET equity (404)' + req.params.id, timer);
-      } else {
-        dal.deleteEquity(id, function() {
-          res.sendStatus(204);
-          logger.logTiming('GET equity (204)' + req.params.id, timer);
-        });
-      }
-    });
+    let doc = await dal.getEquityById(id);
+    if (doc == null) {
+      res.status(404).send(JSON.stringify({ "error": "No resource found."}));
+      logger.logTiming('DELETE equity (404)' + req.params.id, timer);
+    } else {
+      await dal.deleteEquity(id);
+      res.sendStatus(204);
+      logger.logTiming('DELETE equity (204)' + req.params.id, timer);
+    }
   }
 });
 
