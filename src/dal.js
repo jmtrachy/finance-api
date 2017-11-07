@@ -75,7 +75,7 @@ var getEquitiesByFilter = function(queryField, queryValue, callback) {
   });
 };
 
-var getEquityById = function(id, callback) {
+const getEquityById = async(id) => {
   var query = null;
 
   if (id.length > 15) {
@@ -86,15 +86,18 @@ var getEquityById = function(id, callback) {
     logger.log('Retrieving object by ticker ' + JSON.stringify(query));
   }
 
-  mdb.collection(equity_collection).find(query).toArray(function(err, docs) {
-    var doc = docs.length > 0 ? docs[0] : null;
-    logger.log("Retrieved the following records from the database");
-    logger.log(doc == null ? 'None found' : doc);
-    if (doc != null) {
-      delete doc._id;
-    }
-    callback(doc);
-  });
+  // Get the equities that match this criteria
+  let docs = await mdb.collection(equity_collection).find(query).toArray();
+  
+  // Get the first doc (should only be one) and clear out the database id before passing back.
+  var doc = docs.length > 0 ? docs[0] : null;
+  logger.log("Retrieved the following records from the database");
+  logger.log(doc == null ? 'None found' : doc);
+  if (doc != null) {
+    delete doc._id;
+  }
+  
+  return doc;
 };
 
 var deleteEquity = function(id, callback) {

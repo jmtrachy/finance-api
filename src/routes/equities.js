@@ -35,22 +35,22 @@ equityRouter.get('/', function(req, res) {
 });
                  
 // Route for retrieving an equity by Id
-equityRouter.get('/:id', function(req, res) {
+equityRouter.get('/:id', async (req, res) => {
   timer = logger.logTiming();
-  dal.getEquityById(req.params.id, function(doc){
-    
-    if (doc != null) {
-      res.status(200).send(JSON.stringify(doc));
-      logger.logTiming('GET equity ' + req.params.id, timer);
-    } else {
-      var errorMessage = {
-        error: 'No equity found with id ' + req.params.id
-      }
-      res.status(404).send(errorMessage);
-      logger.logTiming('GET equity (404)' + req.params.id, timer);
+  
+  // Get the equity from the id
+  let doc = await dal.getEquityById(req.params.id);
+ 
+  if (doc != null) {
+    res.status(200).send(JSON.stringify(doc));
+    logger.logTiming('GET equity ' + req.params.id, timer);
+  } else {
+    var errorMessage = {
+      error: 'No equity found with id ' + req.params.id
     }
-    
-  });
+    res.status(404).send(errorMessage);
+    logger.logTiming('GET equity (404)' + req.params.id, timer);
+  }
 });
 
 // Route for creating an equity
@@ -82,50 +82,25 @@ equityRouter.put('/:id', function(req, res) {
   });
 });
 
-const patchEquity = async (req, res) => {
+equityRouter.patch('/:id', async (req, res) => {
   var reqBody = req.body;
   var id = req.params.id;
-  logger.log('Patch called for document ' + id + ' and payload ' + JSON.stringify(reqBody));
+  logger.log('Special patch called for document ' + id + ' and payload ' + JSON.stringify(reqBody));
   
   if (id == null) {
     responseMessage = { "error": "An id must be passed in to identify the individual resource."};
     res.status(400).send(JSON.stringify(responseMessage));
   } else {
     
-    dal.getEquityById(id, function(doc) {
-      if (doc == null) {
-        res.status(404).send(JSON.stringify({ "error": "No resource found."}));
-      } else {
-        dal.updateEquity(id, reqBody, function() {
-          res.sendStatus(204);
-        });
-      }
-    });
-  }
-}
-
-equityRouter.patch('/:id', patchEquity);
-
-// Route for updating parts of an equity
-equityRouter.patch('/asdf/:id', function(req, res) {
-  var reqBody = req.body;
-  var id = req.params.id;
-  logger.log('Patch called for document ' + id + ' and payload ' + JSON.stringify(reqBody));
-  
-  if (id == null) {
-    responseMessage = { "error": "An id must be passed in to identify the individual resource."};
-    res.status(400).send(JSON.stringify(responseMessage));
-  } else {
+    let doc = await dal.getEquityById(id);
     
-    dal.getEquityById(id, function(doc) {
-      if (doc == null) {
-        res.status(404).send(JSON.stringify({ "error": "No resource found."}));
-      } else {
-        dal.updateEquity(id, reqBody, function() {
-          res.sendStatus(204);
-        });
-      }
-    });
+    if (doc == null) {
+      res.status(404).send(JSON.stringify({ "error": "No resource found."}));
+    } else {
+      dal.updateEquity(id, reqBody, function() {
+        res.sendStatus(204);
+      });
+    }
   }
 });
 
