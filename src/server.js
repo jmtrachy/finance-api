@@ -3,9 +3,8 @@ var requestId = require('request-id/express');
 var bodyParser = require('body-parser');
 var dal = require('./dal.js');
 var equityRouter = require('./routes/equities.js');
-var snapshotRouter = require('./routes/snapshots.js');
-var aggregateRouter = require('./routes/aggregates.js');
 var healthRouter = require('./routes/health.js');
+var authRouter = require('./routes/auth.js');
 var app = express();
 
 var port = 5000;
@@ -25,10 +24,27 @@ app.use(function(req, res, next) {
   next();
 });
 
+// Validates credentials
+app.use(function(req, res, next) {
+  let authenticated = null;
+  let token = req.get('Authorization');
+
+  // wrap the call to dal.authenticate in an async block so node allows it to proceed
+  (async () => {
+    authenticated = await dal.authenticate(token);
+
+    if (authenticated) {
+      next();
+    } else {
+      res.status(403).send(JSON.stringify({'error': 'missing valid authentication token'}));
+    }
+  })();
+
+});
+
 app.use('/v1/equities', equityRouter);
-//app.use('/v1/equities/:equityId/snapshots', snapshotRouter);
-//app.use('/v1/aggregates', aggregateRouter);
 app.use('/v1/health', healthRouter);
+app.use('/v1/auth', authRouter);
 
 dal.initializeDatabases(function() {
   app.listen(port, function() {

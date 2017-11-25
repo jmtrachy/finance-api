@@ -23,9 +23,11 @@ if (environmentName == 'prod') {
 
 var logVerbose = true;
 var logTimings = true;
+var authIsEnabled = false;
 
 module.exports = {
   env: env,
   logVerbose: logVerbose,
-  logTimings: logTimings
+  logTimings: logTimings,
+  authIsEnabled: authIsEnabled
 };

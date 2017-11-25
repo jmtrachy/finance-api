@@ -1,3 +1,4 @@
+var crypto = require('crypto');
 var MongoClient = require('mongodb').MongoClient
 var assert = require('assert');
 var randomString = require('random-string');
@@ -33,6 +34,54 @@ var initializeDatabases = function(callback) {
   });
 }
 
+// ********************************************* AUTHENTICATION ********************************************* \\
+
+var auth_collection = 'authTokens';
+
+const hashPassword = async (password) => {
+  return crypto.createHash('md5').update(password).digest('hex');
+}
+
+// Hash the token then query the Database for a matching, active token
+const authenticate = async (authToken) => {
+  if (!config.authIsEnabled) {
+    console.log('authentication is not enabled, returning true automatically');
+    return true;
+  }
+
+  let authenticated = false;
+  let hashedToken = await hashPassword(authToken);
+  
+  query = {'token': hashedToken};
+
+  docs = await mdb.collection(auth_collection).find(query).toArray();
+  for (let doc of docs) {
+    if (doc.isActive) {
+      authenticated = true;
+    }
+  }
+
+  return authenticated;
+};
+
+const createAuthToken = async (authToken) => {
+  let hashedToken = await hashPassword(authToken);
+
+  // Create a random id for the auth token
+  authTokenId = randomString(optionsForId);
+
+  // Create the actual token object
+  authTokenJson = {
+    'id': authTokenId,
+    'token': hashedToken,
+    'role': 'admin',
+    'isActive': true
+  }
+  let doc = await mdb.collection(auth_collection).insert(authTokenJson);
+  
+  return doc;
+};
+
 // ********************************************* EQUITIES ********************************************* \\
 
 const createEquity = async (equity) => {
@@ -41,8 +90,8 @@ const createEquity = async (equity) => {
   }
   logger.log('Creating equity');
 
-  let doc = mdb.collection(equity_collection).insert(equity);
-  delete equity._id;
+  let doc = await mdb.collection(equity_collection).insert(equity);
+  delete doc._id;
   
   return doc;
 };
@@ -244,6 +293,10 @@ var deleteAggregateById = function(id, callback) {
 module.exports = {
   // Initialize the database
   initializeDatabases: initializeDatabases,
+
+  // Authentication
+  authenticate: authenticate,
+  createAuthToken: createAuthToken,
   
   // Equities
   getAllEquities: getAllEquities,
