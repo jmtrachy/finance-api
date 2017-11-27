@@ -161,44 +161,41 @@ var updateEquity = function(id, params, callback) {
 // ********************************************* SNAPSHOTS ********************************************* \\
 
 // Creates a new snapshot in the database
-var createSnapshot = function(snapshot, callback) {
+const createSnapshot = async (snapshot) => {
   // Create an id for the snapshot
   snapshot.id = randomString(optionsForId);
   
   // Persist the snapshot to the database - removing the database id from the result
-  mdb.collection(snapshot_collection).insert(snapshot, function(err, result) {
-    logger.log(JSON.stringify(result.result));
-    logger.log(JSON.stringify(result.ops));
-    delete snapshot._id;
-    callback(snapshot);
-  });
+  let insertResults = await mdb.collection(snapshot_collection).insert(snapshot);
+  let doc = insertResults.ops[0];
+  delete doc._id;
+  
+  return doc;
 };
 
 
 // Retrieves a single snapshot by id
-var getSnapshotById = function(id, callback) {
+const getSnapshotById = async (id) => {
   var query = {'id': id};
-  mdb.collection(snapshot_collection).find(query).toArray(function(err, docs) {
-    var doc = docs.length > 0 ? docs[0] : null;
-    logger.log("Retrieved the following records from the database");
-    logger.log(doc == null ? 'None found' : doc);
-    if (doc != null) {
-      delete doc._id;
-    }
-    callback(doc);
-  });
+  
+  let docs = await mdb.collection(snapshot_collection).find(query).toArray();
+  console.log('Docs = ' + JSON.stringify(docs));
+  let doc = docs[0];
+  delete doc._id;
+  
+  return doc;
 };
 
 
 // Retrieve snapshots that belong to an individual entity
-var getSnapshotsByEquity = function(id, limit, callback) {
+const getSnapshotsByEquity = async (id, limit) => {
   var query = {};
 
   if (id.length > 15) {
     query = {'equityId': id};
     logger.log('Retrieving object by data store id ' + JSON.stringify(query));
   } else {
-    query = {'ticker': id};
+    query = {'ticker': id.toUpperCase()};
     logger.log('Retrieving object by ticker ' + JSON.stringify(query));
   }
 
@@ -207,22 +204,19 @@ var getSnapshotsByEquity = function(id, limit, callback) {
     'sort': [['date', 'desc']]
   };
 
-  mdb.collection(snapshot_collection).find(query, options).toArray(function(err, docs) {
-    for (doc in docs) {
-      delete docs[doc]._id;
-    }
-    callback(docs);
-  });
+  let docs = await mdb.collection(snapshot_collection).find(query, options).toArray();
+  for (doc in docs) {
+    delete docs[doc]._id;
+  }
 
+  return docs;
 };
 
 
 // Deletes an individual snapshot by id
-var deleteSnapshotById = function(id, callback) {
-  mdb.collection(snapshot_collection).deleteOne({'id':id}, function(err, result) {
-    logger.log('Snapshot by id ' + id + ' has been deleted.');
-    callback();
-  });
+const deleteSnapshotById = async (id) => {
+  await mdb.collection(snapshot_collection).deleteOne({'id':id});
+  logger.log('Snapshot by id ' + id + ' has been deleted.');
 };
 
 // ********************************************* AGGREGATES ********************************************* \\

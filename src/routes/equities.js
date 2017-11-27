@@ -125,7 +125,7 @@ equityRouter.delete('/:id', async (req, res) => {
 
 //******************************************** Snapshots ************************************************
 
-equityRouter.get('/:id/snapshots', function(req, res) {
+equityRouter.get('/:id/snapshots', async (req, res) => {
   var id = req.params.id;
   timer = logger.logTiming();
   logger.log('id = ' + id);
@@ -141,16 +141,15 @@ equityRouter.get('/:id/snapshots', function(req, res) {
       numResults = Number(numResults);
     }
     
-    dal.getSnapshotsByEquity(id, numResults, function(docs) {
-      logger.log(docs)
-      logger.logTiming('Completing get of ' + numResults + ' snapshots for equity ' + id, timer);
-      res.status(200).send(JSON.stringify(docs));
-    });
+    let snapshots = await dal.getSnapshotsByEquity(id, numResults);
+    logger.log(snapshots)
+    logger.logTiming('Completing get of ' + numResults + ' snapshots for equity ' + id, timer);
+    res.status(200).send(JSON.stringify(snapshots));
   } 
 });
 
 // Route for creating an equity snapshot
-equityRouter.post('/:id/snapshots', function(req, res) {
+equityRouter.post('/:id/snapshots', async (req, res) => {
   timer = logger.logTiming();
   
   var reqBody = req.body;
@@ -166,34 +165,34 @@ equityRouter.post('/:id/snapshots', function(req, res) {
   }
   
   if (!reqBody.id) {
-    dal.createSnapshot(reqBody, function(snapshot) {
-      logger.logTiming('POST snapshot for equity ' + req.params.id, timer);
-      res.status(201).send(JSON.stringify(snapshot));
-    });
+    let snapshot = await dal.createSnapshot(reqBody);
+    logger.logTiming('POST snapshot for snapshot ' + req.params.id, timer);
+    res.status(201).send(JSON.stringify(snapshot));
   } else {
     res.status(400).send('{ "error": "Update not supported yet" }');
   }  
 }); 
 
 // Route for retrieving a snapshot by Id
-equityRouter.get('/:equityId/snapshots/:id', function(req, res) {
+equityRouter.get('/:equityId/snapshots/:id', async(req, res) => {
   timer = logger.logTiming();
-  dal.getSnapshotById(req.params.id, function(doc){
-    logger.logTiming('GET snapshot ' + req.params.id + ' for equity ' + req.params.equityId, timer);
-    if (doc != null) {
-      res.status(200).send(JSON.stringify(doc));  
-    } else {
-      var errorMessage = {
-        error: 'No snapshot found with id ' + req.params.id
-      }
-      res.status(404).send(errorMessage);
+  let snapshot = await dal.getSnapshotById(req.params.id);
+  
+  // Print the length of time it took to produce the response
+  logger.logTiming('GET snapshot ' + req.params.id + ' for equity ' + req.params.equityId, timer);
+  
+  if (snapshot != null) {
+    res.status(200).send(JSON.stringify(snapshot));  
+  } else {
+    var errorMessage = {
+      error: 'No snapshot found with id ' + req.params.id
     }
-    
-  });
+    res.status(404).send(errorMessage);
+  }
 });
 
 // Deletes a particular record by id
-equityRouter.delete('/:equityId/snapshots/:id', function(req, res) {
+equityRouter.delete('/:equityId/snapshots/:id', async (req, res) => {
   timer = logger.logTiming();
   var responseCode = null;
   var id = req.params.id;
@@ -203,16 +202,15 @@ equityRouter.delete('/:equityId/snapshots/:id', function(req, res) {
     responseMessage = { "error": "An id must be passed in to identify the individual resource."};
     res.status(400).send(JSON.stringify(responseMessage));
   } else {
-    dal.getSnapshotById(id, function(doc) {
-      if (doc == null) {
-        res.status(404).send(JSON.stringify({ "error": "No resource found."}));
-      } else {
-        dal.deleteSnapshotById(id, function() {
-          logger.logTiming('Deleting snapshot ' + id, timer);
-          res.sendStatus(204);
-        });
-      }
-    });
+    let doc = await dal.getSnapshotById(id);
+    
+    if (doc == null) {
+      res.status(404).send(JSON.stringify({ "error": "No resource found."}));
+    } else {
+      await dal.deleteSnapshotById(id);
+      logger.logTiming('Deleting snapshot ' + id, timer);
+      res.sendStatus(204);
+    }
   }
 });
 
