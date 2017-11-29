@@ -258,7 +258,7 @@ equityRouter.get('/:equityId/aggregates/:id', function(req, res) {
 });
 
 // Route for creating an aggregate
-equityRouter.post('/:id/aggregates', function(req, res) {
+equityRouter.post('/:id/aggregates', async(req, res) => {
   timer = logger.logTiming();
   var reqBody = req.body;  
   id = req.params.id;
@@ -274,10 +274,9 @@ equityRouter.post('/:id/aggregates', function(req, res) {
   logger.log('Post called with ' + JSON.stringify(reqBody));
   
   if (!reqBody.id) {
-    dal.createAggregate(reqBody, function(aggregate) {
-      res.status(201).send(JSON.stringify(aggregate));
-      logger.logTiming('POST aggregate of id ' + req.params.id, timer);
-    });
+    let aggregate = await dal.createAggregate(reqBody);
+    res.status(201).send(JSON.stringify(aggregate));
+    logger.logTiming('POST aggregate of id ' + req.params.id, timer);
   } else {
     res.status(400).send('{ "error": "Update not supported yet" }');
   }  

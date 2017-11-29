@@ -222,17 +222,18 @@ const deleteSnapshotById = async (id) => {
 // ********************************************* AGGREGATES ********************************************* \\
 
 // Creates a new aggregate in the database
-var createAggregate = function(aggregate, callback) {
+const createAggregate = async (aggregate) => {
   // Assign a random id for the new aggregate
   aggregate.id = randomString(optionsForId);
 
   // Create the aggregate, return a version stripped of the database id
-  mdb.collection(aggregate_collection).insert(aggregate, function(err, result) {
-    logger.log(JSON.stringify(result.result));
-    logger.log(JSON.stringify(result.ops));
-    delete aggregate._id;
-    callback(aggregate);
-  });
+  let result = await mdb.collection(aggregate_collection).insert(aggregate);
+  let createdAggregate = result.ops[0];
+  logger.log(JSON.stringify(result.result));
+  //logger.log(JSON.stringify(result.ops[0]));
+  delete createdAggregate._id;
+  
+  return createdAggregate;
 };
 
 // Retrieves aggregates by ticker symbol - always sorting by date descending first
